@@ -464,6 +464,42 @@ Heap Capacity Used Remaining            526.46 us       1000000
 ----------------------------------------------------------------------
 ```
 
+### Summary
+
+Arena dominates wherever bulk patterns or batch lifetimes are involved.
+Sequential allocation (`Arena Sequential`: 57 ms vs `Heap Sequential`: 348 ms) and
+filling to capacity (`Arena Until Full`: 43 ms vs `Heap Until Full`: 292 ms) show
+the clearest wins — no per-allocation overhead means the gap widens with count.
+
+Frame management tells the same story. Nested frames (`Arena Nested Frames`: 168 ms vs
+`Heap Nested Frames`: 458 ms) and frame/scope with allocations show 6–10x advantages
+because `endFrame` is a single pointer rewind vs N individual `delete` calls.
+
+State management reinforces this — `reset` against multiple allocations
+(`Arena Reset Multiple`: 113 ms vs `Heap Reset Multiple`: 792 ms) is the starkest
+example of O(1) bulk reclaim vs O(n) heap deallocation.
+
+Heap wins on single object operations. Single `create`/`destroy` cycles
+(`Arena Create`: 259 ms vs `Heap Create`: 169 ms) favor heap because the arena
+still pays construction cost without gaining anything from its bulk advantages.
+Introspection accessors (`owns`, `view`, `getStats`) are near-zero cost on both sides.
+
+| Category             | Winner | Notes                                          |
+| -------------------- | ------ | ---------------------------------------------- |
+| Raw allocation       | Arena  | Bump pointer vs heap search                    |
+| Sequential creates   | Arena  | 6x faster — no per-object overhead             |
+| Bulk fill            | Arena  | 6x faster — single buffer, no fragmentation    |
+| Frame with allocs    | Arena  | 10x faster — endFrame vs N deletes             |
+| Scope with allocs    | Arena  | 5x faster — RAII rewind vs N deletes           |
+| Nested frames        | Arena  | 2.7x faster — stack rewind vs heap dealloc     |
+| Reset multiple       | Arena  | 7x faster — O(1) rewind vs O(n) delete         |
+| Single create        | Heap   | Arena pays construction with no bulk benefit   |
+| Single destroy       | Heap   | Heap dealloc faster without frame advantage    |
+| Introspection        | Tie    | Both near-zero cost                            |
+
+**Use Arena when:** lifetimes are grouped, objects are short-lived, or bulk reset is needed.
+**Use heap when:** individual objects have independent lifetimes and are few in number.
+
 ---
 
 ## Project Structure
@@ -474,8 +510,10 @@ ArenaAllocator/
 │   ├── Arena.h
 │   ├── Arena.tpp
 │   └── ArenaScope.h
+│
 ├── src/
 │   └── Arena.cpp
+│
 ├── tests/
 │   ├── test_helper.h
 │   ├── test_all.cpp
@@ -485,6 +523,7 @@ ArenaAllocator/
 │   ├── test_frame_management.cpp
 │   ├── test_state_management.cpp
 │   └── test_introspection.cpp
+│
 ├── benchmarks/
 │   ├── benchmark_helper.h
 │   ├── bench_all.cpp
@@ -494,13 +533,16 @@ ArenaAllocator/
 │   ├── bench_frame_management.cpp
 │   ├── bench_state_management.cpp
 │   └── bench_introspection.cpp
+│
 ├── examples/
 │   ├── example_helper.h
 │   ├── example_basic.cpp
 │   ├── example_lifecycle.cpp
 │   └── example_scope.cpp
+│
 ├── CMakeLists.txt
-└── README.md
+├── README.md
+└── LICENSE
 ```
 
 ---
@@ -554,4 +596,4 @@ cmake --build .
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+[MIT](LICENSE) — free to use, modify, and distribute for educational and personal purposes.
