@@ -1,0 +1,2 @@
+/data/data/com.termux/files/usr/bin/llvm-ar qc libArenaPro.a CMakeFiles/ArenaPro.dir/src/Arena.cpp.o
+/data/data/com.termux/files/usr/bin/llvm-ranlib libArenaPro.a

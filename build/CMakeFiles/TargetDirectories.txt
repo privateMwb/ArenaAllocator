@@ -1,0 +1,8 @@
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/ArenaPro.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/tests.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/benchmarks.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/ex1.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/ex2.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/ex3.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/edit_cache.dir
+/data/data/com.termux/files/home/projects/C++/AllocatorPro/Arena/build/CMakeFiles/rebuild_cache.dir
