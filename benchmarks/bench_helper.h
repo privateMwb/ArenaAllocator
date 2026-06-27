@@ -132,7 +132,9 @@ inline void setHeader(const char* header) {
 #define BENCH(name, iteration, expr) do {                      \
 auto start = steady_clock::now();                              \
 for (std::size_t i = 0; i < iteration; ++i) {                  \
-	(void)(expr);                                          \
+        doNotOptimize();                                       \
+	expr();                                                \
+        doNotOptimize();                                       \
 }                                                              \
 auto end  = steady_clock::now();                               \
 auto ns   = duration_cast<nanoseconds>(end - start);           \

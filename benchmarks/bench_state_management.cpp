@@ -14,33 +14,39 @@ using namespace AllocatorPro;
 // Reset Single
 // measures reset after single allocation vs heap deallocation
 static void bench_reset_single() {
-    BENCH("arena_reset_single", LARGE, {
+    auto arenaBench = [&] {
         Arena arena{1024};
         (void)arena.allocate(64, alignof(std::max_align_t));
         arena.reset();
         doNotOptimize(arena);
-    });
+    };
 
-    BENCH("heap_reset_single", LARGE, {
+    BENCH("arena_reset_single", LARGE, arenaBench);
+
+    auto heapBench = [&] {
         void* p = ::operator new(64);
         doNotOptimize(p);
         ::operator delete(p);
-    });
+    };
+
+    BENCH("heap_reset_single", LARGE, heapBench);
 }
 
 // Reset Multiple
 // measures reset after multiple allocations vs heap deallocation of each
 static void bench_reset_multiple() {
-    BENCH("arena_reset_multiple", MEDIUM, {
+    auto arenaBench = [&] {
         Arena arena{sizeof(Item) * 10 * 2};
         for (int j = 0; j < 10; ++j) {
             Item* p = arena.create<Item>(j, float(j), double(j));
             doNotOptimize(p);
         }
         arena.reset();
-    });
+    };
 
-    BENCH("heap_reset_multiple", MEDIUM, {
+    BENCH("arena_reset_multiple", MEDIUM, arenaBench);
+
+    auto heapBench = [&] {
         Item* ptrs[10];
         for (int j = 0; j < 10; ++j) {
             ptrs[j] = new Item(j, float(j), double(j));
@@ -48,50 +54,61 @@ static void bench_reset_multiple() {
         }
         for (int j = 0; j < 10; ++j)
             delete ptrs[j];
-    });
+    };
+
+    BENCH("heap_reset_multiple", MEDIUM, heapBench);
 }
 
 // Reset And Reallocate
 // measures reset followed by reallocation vs heap dealloc and realloc
 static void bench_reset_and_reallocate() {
-    BENCH("arena_reset_reallocate", MEDIUM, {
+    auto arenaBench = [&] {
         Arena arena{sizeof(Item) * 2};
         Item* p1 = arena.create<Item>(1, 1.0f, 1.0);
         doNotOptimize(p1);
         arena.reset();
         Item* p2 = arena.create<Item>(2, 2.0f, 2.0);
         doNotOptimize(p2);
-    });
+    };
 
-    BENCH("heap_reset_reallocate", MEDIUM, {
+    BENCH("arena_reset_reallocate", MEDIUM, arenaBench);
+
+    auto heapBench = [&] {
         Item* p1 = new Item(1, 1.0f, 1.0);
         doNotOptimize(p1);
         delete p1;
+
         Item* p2 = new Item(2, 2.0f, 2.0);
         doNotOptimize(p2);
         delete p2;
-    });
+    };
+
+    BENCH("heap_reset_reallocate", MEDIUM, heapBench);
 }
 
 // Repeated Reset Cycles
 // measures repeated reset cycles vs repeated heap alloc/dealloc cycles
 static void bench_repeated_reset_cycles() {
-    BENCH("arena_repeated_cycles", SMALL, {
+    auto arenaBench = [&] {
         Arena arena{sizeof(Item) * 5 * 2};
         for (int j = 0; j < 5; ++j) {
             Item* p = arena.create<Item>(j, float(j), double(j));
             doNotOptimize(p);
             arena.reset();
         }
-    });
+    };
 
-    BENCH("heap_repeated_cycles", SMALL, {
+    BENCH("arena_repeated_cycles", SMALL, arenaBench);
+
+    auto heapBench = [&] {
         for (int j = 0; j < 5; ++j) {
             Item* p = new Item(j, float(j), double(j));
             doNotOptimize(p);
             delete p;
         }
-    });
+    };
+
+    BENCH("heap_repeated_cycles", SMALL, heapBench);
 }
 
 // Benchmark Runner

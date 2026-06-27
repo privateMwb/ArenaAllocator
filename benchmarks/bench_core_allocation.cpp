@@ -16,12 +16,12 @@ using namespace AllocatorPro;
 // Raw Allocate
 // measures raw allocate vs heap allocation of equivalent size
 static void bench_raw_allocate() {
-    BENCH("arena_raw_allocate", LARGE, {
+    BENCH("arena_raw_allocate", LARGE, [&] {
         Arena arena{1024};
         (void)arena.allocate(64, alignof(std::max_align_t));
     });
 
-    BENCH("heap_raw_allocate", LARGE, {
+    BENCH("heap_raw_allocate", LARGE, [&] {
         void* p = ::operator new(64);
         doNotOptimize(p);
         ::operator delete(p);
@@ -31,13 +31,13 @@ static void bench_raw_allocate() {
 // Typed Allocate
 // measures typed allocate<Item> vs new Item without construction
 static void bench_typed_allocate() {
-    BENCH("arena_typed_allocate", MEDIUM, {
+    BENCH("arena_typed_allocate", MEDIUM, [&] {
         Arena arena{sizeof(Item) * 2};
         Item* p = arena.allocate<Item>();
         doNotOptimize(p);
     });
 
-    BENCH("heap_typed_allocate", MEDIUM, {
+    BENCH("heap_typed_allocate", MEDIUM, [&] {
         Item* p = static_cast<Item*>(::operator new(sizeof(Item)));
         doNotOptimize(p);
         ::operator delete(p);
@@ -47,13 +47,13 @@ static void bench_typed_allocate() {
 // Create
 // measures create<Item> with constructor args vs new Item with args
 static void bench_create() {
-    BENCH("arena_create", MEDIUM, {
+    BENCH("arena_create", MEDIUM, [&] {
         Arena arena{sizeof(Item) * 2};
         Item* p = arena.create<Item>(1, 2.0f, 3.0);
         doNotOptimize(p);
     });
 
-    BENCH("heap_create", MEDIUM, {
+    BENCH("heap_create", MEDIUM, [&] {
         Item* p = new Item(1, 2.0f, 3.0);
         doNotOptimize(p);
         delete p;
@@ -63,7 +63,7 @@ static void bench_create() {
 // Sequential Allocations
 // measures multiple sequential arena allocations vs multiple heap allocations
 static void bench_sequential_allocations() {
-    BENCH("arena_sequential", SMALL, {
+    BENCH("arena_sequential", SMALL, [&] {
         Arena arena{sizeof(Item) * 10 * 2};
         for (int j = 0; j < 10; ++j) {
             Item* p = arena.create<Item>(j, float(j), double(j));
@@ -71,7 +71,7 @@ static void bench_sequential_allocations() {
         }
     });
 
-    BENCH("heap_sequential", SMALL, {
+    BENCH("heap_sequential", SMALL, [&] {
         Item* ptrs[10];
         for (int j = 0; j < 10; ++j) {
             ptrs[j] = new Item(j, float(j), double(j));
@@ -85,10 +85,10 @@ static void bench_sequential_allocations() {
 // Allocate Until Full
 // measures filling the arena to capacity vs equivalent heap allocations
 static void bench_allocate_until_full() {
-    constexpr std::size_t kCount    = 16;
+    constexpr std::size_t kCount     = 16;
     constexpr std::size_t kArenaSize = sizeof(Item) * kCount * 2;
 
-    BENCH("arena_until_full", SMALL, {
+    BENCH("arena_until_full", SMALL, [&] {
         Arena arena{kArenaSize};
         for (std::size_t j = 0; j < kCount; ++j) {
             Item* p = arena.create<Item>(int(j), float(j), double(j));
@@ -96,7 +96,7 @@ static void bench_allocate_until_full() {
         }
     });
 
-    BENCH("heap_until_full", SMALL, {
+    BENCH("heap_until_full", SMALL, [&] {
         Item* ptrs[kCount];
         for (std::size_t j = 0; j < kCount; ++j) {
             ptrs[j] = new Item(int(j), float(j), double(j));

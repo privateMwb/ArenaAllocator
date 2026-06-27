@@ -15,12 +15,12 @@ using namespace AllocatorPro;
 // Construct
 // measures arena construction vs equivalent heap allocation and deallocation
 static void bench_construct() {
-    BENCH("arena_construct", LARGE, {
+    BENCH("arena_construct", LARGE, [&] {
         Arena arena{1024};
         doNotOptimize(arena);
     });
 
-    BENCH("heap_construct", LARGE, {
+    BENCH("heap_construct", LARGE, [&] {
         void* p = ::operator new(1024);
         doNotOptimize(p);
         ::operator delete(p);
@@ -30,13 +30,13 @@ static void bench_construct() {
 // Move Construct
 // measures arena move construction vs heap pointer reassignment
 static void bench_move_construct() {
-    BENCH("arena_move_construct", LARGE, {
+    BENCH("arena_move_construct", LARGE, [&] {
         Arena a{1024};
         Arena b{std::move(a)};
         doNotOptimize(b);
     });
 
-    BENCH("heap_move_construct", LARGE, {
+    BENCH("heap_move_construct", LARGE, [&] {
         void* a = ::operator new(1024);
         void* b = a;
         doNotOptimize(b);
@@ -47,14 +47,14 @@ static void bench_move_construct() {
 // Move Assign
 // measures arena move assignment vs heap reallocation and pointer swap
 static void bench_move_assign() {
-    BENCH("arena_move_assign", LARGE, {
+    BENCH("arena_move_assign", LARGE, [&] {
         Arena a{1024};
         Arena b{512};
         b = std::move(a);
         doNotOptimize(b);
     });
 
-    BENCH("heap_move_assign", LARGE, {
+    BENCH("heap_move_assign", LARGE, [&] {
         void* a = ::operator new(1024);
         void* b = ::operator new(512);
         ::operator delete(b);
