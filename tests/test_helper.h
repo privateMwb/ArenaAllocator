@@ -1,41 +1,41 @@
 #pragma once
 
-#include "Arena.h"
-#include "ArenaScope.h"
+#include <ArenaPro/Arena.h>
+#include <ArenaPro/ArenaScope.h>
 
 #include <iostream>
 #include <string>
 
-// global test counters
+// Global test counters.
 inline int total  = 0;
 inline int pass   = 0;
 inline int fail   = 0;
 
-// terminal colors
+// ANSI terminal color codes.
 constexpr const char* RESET = "\033[0m";
 constexpr const char* GREEN = "\033[92m";
 constexpr const char* RED   = "\033[91m";
 constexpr const char* CYAN  = "\033[96m";
 constexpr const char* GRAY  = "\033[37m";
 
-// prints a horizontal separator line
+// Prints a horizontal separator line.
 inline void borderLine() {
     std::cout << GRAY << std::string(70, '-') << RESET << "\n";
 }
 
-// prints the overall test statistics
+// Prints the overall test statistics.
 inline void stats() {
     std::cout << "T: " << total << "\n";
     std::cout << "P: " << pass << "\n";
     std::cout << "F: " << fail << "\n";
 }
 
-// prints a section title in cyan
+// Prints a test suite title.
 inline void setTitle(std::string_view title) {
     std::cout << CYAN << title << RESET << "\n";
 }
 
-// converts snake_case function name to Title Case for display
+// Converts a snake_case function name to Title Case.
 inline std::string prettify(const char* name) {
     std::string result{name};
     bool firstLetter = true;
@@ -54,17 +54,38 @@ inline std::string prettify(const char* name) {
     return result;
 }
 
-// runs a test function and prints PASS on success
-#define RUN(name) do {                  \
-    name();                             \
-    std::cout << GREEN                  \
-              << "[PASS] "              \
-              << RESET                  \
-              << prettify(#name)        \
-              << "\n";                  \
+// Executes a test function and prints a success message.
+#define RUN(name) do {                          \
+    try {                                       \
+        int f = fail;                           \
+        name();                                 \
+        if(f == fail){                          \
+            std::cout << GREEN                  \
+                      << "[PASS] "              \
+                      << RESET                  \
+                      << prettify(#name)        \
+                      << "\n";                  \
+        }                                       \
+    } catch (const std::exception& e) {         \
+        ++fail;                                 \
+        std::cout << RED                        \
+                  << "[FAIL] "                  \
+                  << RESET                      \
+                  << prettify(#name)            \
+                  << " threw: "                 \
+                  << e.what()                   \
+                  << "\n";                      \
+    } catch (...) {                             \
+        ++fail;                                 \
+        std::cout << RED                        \
+                  << "[FAIL] "                  \
+                  << RESET                      \
+                  << prettify(#name)            \
+                  << " threw unknown\n";        \
+    }                                           \
 } while (0)
 
-// checks an expression and tracks pass/fail/total counts
+// Evaluates a test condition and updates the test statistics.
 #define CHK(expr) do {                  \
     if (!(expr)) {                      \
         ++fail;                         \
@@ -80,13 +101,3 @@ inline std::string prettify(const char* name) {
     ++total;                            \
 } while (0)
 
-// shared callable for testing create/destroy with non-trivial types
-struct Probe {
-    int   value_;
-    bool& destroyed_;
-
-    Probe(int value, bool& destroyed)
-        : value_(value), destroyed_(destroyed) {}
-
-    ~Probe() { destroyed_ = true; }
-};

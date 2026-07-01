@@ -1,35 +1,46 @@
 // Arena Object Lifecycle Test Suite
-// Validates create and destroy behavior for trivial and non-trivial types,
-// including constructor forwarding, destructor invocation, and null safety.
+// Validates object construction and destruction within the arena,
+// including constructor forwarding, allocation failure, and
+// destructor invocation.
 //
 // Covers:
-// - create returns non-null pointer for trivial type
-// - create correctly forwards constructor arguments
-// - create returns nullptr when arena is full
-// - destroy invokes destructor on non-trivial type
-// - create and destroy work correctly with Probe type
+// - trivial object creation
+// - constructor argument forwarding
+// - out-of-memory object creation
+// - destructor invocation
+// - complete create/destroy lifecycle
 
 #include "test_helper.h"
 
-// Create Trivial
-// verifies create returns a valid pointer for a trivial type
+// Probe Type
+// Tracks object destruction for lifecycle verification.
+struct Probe {
+    int   value_;
+    bool& destroyed_;
+
+    Probe(int value, bool& destroyed)
+        : value_(value), destroyed_(destroyed) {}
+
+    ~Probe() { destroyed_ = true; }
+};
+
+// Verifies trivial objects are constructed successfully.
 static void create_trivial() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     int* p = arena.create<int>(42);
 
     CHK(p != nullptr);
     CHK(*p == 42);
 }
 
-// Create Forwards Arguments
-// verifies create correctly forwards multiple constructor arguments
+// Verifies constructor arguments are perfectly forwarded.
 static void create_forwards_arguments() {
     struct Vec2 {
         float x_, y_;
         Vec2(float x, float y) : x_(x), y_(y) {}
     };
 
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     Vec2* v = arena.create<Vec2>(1.0f, 2.0f);
 
     CHK(v != nullptr);
@@ -37,19 +48,17 @@ static void create_forwards_arguments() {
     CHK(v->y_ == 2.0f);
 }
 
-// Create Out Of Memory
-// verifies create returns nullptr when arena cannot satisfy the allocation
+// Verifies object creation fails when the arena lacks capacity.
 static void create_out_of_memory() {
-    AllocatorPro::Arena arena{4};
+    AllocatorPro::Arena<false> arena{4};
     double* p = arena.create<double>(3.14);
 
     CHK(p == nullptr);
 }
 
-// Destroy Invokes Destructor
-// verifies destroy calls the destructor on a non-trivial type
+// Verifies destroy invokes the object's destructor.
 static void destroy_invokes_destructor() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     bool destroyed = false;
 
     Probe* p = arena.create<Probe>(1, destroyed);
@@ -59,25 +68,23 @@ static void destroy_invokes_destructor() {
     CHK(destroyed == true);
 }
 
-// Create Destroy Probe
-// verifies full create/destroy cycle with Probe tracks value and destruction
+// Verifies objects complete the full create/destroy lifecycle.
 static void create_destroy_probe() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     bool destroyed = false;
 
     Probe* p = arena.create<Probe>(99, destroyed);
 
     CHK(p != nullptr);
-    CHK(p->value_    == 99);
-    CHK(destroyed    == false);
+    CHK(p->value_ == 99);
+    CHK(destroyed == false);
 
     arena.destroy(p);
     CHK(destroyed == true);
 }
 
-// Test Runner
 // Executes all object lifecycle test cases.
-void run_object_lifecycle_tests() {
+void run_lifecycle_tests() {
     setTitle("Object Lifecycle Tests");
 
     RUN(create_trivial);

@@ -1,46 +1,45 @@
-// Arena Core Allocation Test Suite
-// Validates fundamental allocation behavior, alignment guarantees,
-// overflow handling, and pointer validity after allocation.
+// Arena Memory Allocation Test Suite
+// Validates allocation behavior, alignment guarantees, capacity
+// limits, pointer correctness, and allocation statistics.
 //
 // Covers:
-// - basic allocation returns non-null pointer
-// - allocation advances offset correctly
-// - alignment is respected for various alignments
-// - over-capacity allocation returns nullptr
-// - multiple allocations are contiguous and non-overlapping
-// - typed allocate<T> returns correctly aligned pointer
-// - stats update correctly after allocation
+// - basic allocation
+// - offset advancement
+// - alignment guarantees
+// - over-capacity allocation
+// - exact-capacity allocation
+// - non-overlapping allocations
+// - typed allocation
+// - allocation statistics
+// - peak usage tracking
 
 #include "test_helper.h"
 
 #include <cstddef>
 
-// Basic Allocation
-// verifies allocation returns a non-null pointer for valid inputs
+// Verifies a valid allocation returns a non-null pointer.
 static void basic_allocation() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     void* ptr = arena.allocate(64, alignof(std::max_align_t));
 
     CHK(ptr != nullptr);
 }
 
-// Offset Advance
-// verifies used() increases by at least the requested size after allocation
+// Verifies allocation advances the arena offset.
 static void offset_advance() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     (void)arena.allocate(64, alignof(std::max_align_t));
 
     CHK(arena.used() >= 64);
     CHK(arena.remaining() <= 960);
 }
 
-// Alignment Respected
-// verifies returned pointer satisfies the requested alignment
+// Verifies returned pointers satisfy the requested alignment.
 static void alignment_respected() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
 
-    void* p1 = arena.allocate(1,  1);
-    void* p2 = arena.allocate(4,  4);
+    void* p1 = arena.allocate(1, 1);
+    void* p2 = arena.allocate(4, 4);
     void* p4 = arena.allocate(16, 16);
 
     CHK(reinterpret_cast<std::uintptr_t>(p1) % 1  == 0);
@@ -48,20 +47,18 @@ static void alignment_respected() {
     CHK(reinterpret_cast<std::uintptr_t>(p4) % 16 == 0);
 }
 
-// Over Capacity
-// verifies allocation beyond capacity returns nullptr
+// Verifies allocations exceeding capacity fail.
 static void over_capacity() {
-    AllocatorPro::Arena arena{64};
+    AllocatorPro::Arena<false> arena{64};
     void* ptr = arena.allocate(128, alignof(std::max_align_t));
 
     CHK(ptr == nullptr);
     CHK(arena.used() == 0);
 }
 
-// Exact Capacity
-// verifies allocation of exactly the full capacity succeeds
+// Verifies an allocation equal to the arena capacity succeeds.
 static void exact_capacity() {
-    AllocatorPro::Arena arena{64};
+    AllocatorPro::Arena<false> arena{64};
     void* ptr = arena.allocate(64, 1);
 
     CHK(ptr != nullptr);
@@ -69,10 +66,9 @@ static void exact_capacity() {
     CHK(arena.remaining() == 0);
 }
 
-// Non Overlapping Allocations
-// verifies successive allocations do not overlap in memory
+// Verifies consecutive allocations do not overlap.
 static void non_overlapping_allocations() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
 
     void* p1 = arena.allocate(64, alignof(std::max_align_t));
     void* p2 = arena.allocate(64, alignof(std::max_align_t));
@@ -83,10 +79,9 @@ static void non_overlapping_allocations() {
     CHK(a2 >= a1 + 64);
 }
 
-// Typed Allocate
-// verifies allocate<T> returns a pointer with correct type alignment
+// Verifies typed allocations return correctly aligned storage.
 static void typed_allocate() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
 
     int*    pi = arena.allocate<int>();
     double* pd = arena.allocate<double>();
@@ -97,10 +92,9 @@ static void typed_allocate() {
     CHK(reinterpret_cast<std::uintptr_t>(pd) % alignof(double) == 0);
 }
 
-// Stats After Allocation
-// verifies allocations_ and totalAllocated_ update correctly
+// Verifies allocation statistics update correctly.
 static void stats_after_allocation() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<true> arena{1024};
     (void)arena.allocate(32, alignof(std::max_align_t));
     (void)arena.allocate(64, alignof(std::max_align_t));
 
@@ -111,24 +105,20 @@ static void stats_after_allocation() {
     CHK(s.currentUsed_    == arena.used());
 }
 
-// Peak Used Tracking
-// verifies peakUsed_ reflects the highest watermark reached
+// Verifies the peak usage watermark is preserved after reset.
 static void peak_used_tracking() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<true> arena{1024};
     (void)arena.allocate(256, alignof(std::max_align_t));
-
-    const std::size_t peak = arena.getStats().peakUsed_;
 
     arena.reset();
     (void)arena.allocate(64, alignof(std::max_align_t));
 
-    CHK(arena.getStats().peakUsed_ == peak);
+    CHK(arena.getStats().peakUsed_ == 64);
 }
 
-// Test Runner
-// Executes all core allocation test cases.
-void run_core_allocation_tests() {
-    setTitle("Core Allocation Tests");
+// Executes all memory allocation test cases.
+void run_memory_tests() {
+    setTitle("Memory Allocation Tests");
 
     RUN(basic_allocation);
     RUN(offset_advance);

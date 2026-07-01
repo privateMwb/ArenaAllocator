@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Arena.h"
-#include "ArenaScope.h"
+#include <ArenaPro/Arena.h>
+#include <ArenaPro/ArenaScope.h>
 
 #include <iostream>
 #include <string>

@@ -1,21 +1,21 @@
 // Arena Frame Management Test Suite
-// Validates frame push/pop behavior, nested frames, and state restoration
-// after endFrame across single and multiple frame depths.
+// Validates frame creation, rollback behavior, nested frames,
+// automatic scope rollback, and statistics updates.
 //
 // Covers:
-// - beginFrame saves current offset
-// - endFrame restores offset after allocation
-// - nested frames restore correctly in reverse order
-// - allocations within frame are discarded after endFrame
-// - stats reflect restored offset after endFrame
-// - ArenaScope restores frame automatically on destruction
+// - frame creation
+// - frame rollback
+// - nested frames
+// - allocation rollback
+// - statistics after rollback
+// - ArenaScope rollback
+// - nested ArenaScope rollback
 
 #include "test_helper.h"
 
-// Begin Frame Saves Offset
-// verifies beginFrame records the current offset onto the frame stack
+// Verifies beginFrame records the current allocation state.
 static void begin_frame_saves_offset() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     (void)arena.allocate(64, alignof(std::max_align_t));
 
     const std::size_t before = arena.used();
@@ -25,10 +25,9 @@ static void begin_frame_saves_offset() {
     CHK(arena.used() > before);
 }
 
-// End Frame Restores Offset
-// verifies endFrame rewinds the arena to the offset saved by beginFrame
+// Verifies endFrame restores the previous allocation state.
 static void end_frame_restores_offset() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     (void)arena.allocate(64, alignof(std::max_align_t));
 
     const std::size_t before = arena.used();
@@ -40,10 +39,9 @@ static void end_frame_restores_offset() {
     CHK(arena.used() == before);
 }
 
-// Nested Frames
-// verifies nested beginFrame/endFrame pairs restore offsets in reverse order
+// Verifies nested frames unwind in reverse order.
 static void nested_frames() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
 
     const std::size_t base = arena.used();
 
@@ -61,10 +59,9 @@ static void nested_frames() {
     CHK(arena.used() == base);
 }
 
-// Frame Discards Allocations
-// verifies allocations made inside a frame are not visible after endFrame
+// Verifies allocations inside a frame are discarded after rollback.
 static void frame_discards_allocations() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
 
     arena.beginFrame();
     (void)arena.allocate(256, alignof(std::max_align_t));
@@ -75,10 +72,9 @@ static void frame_discards_allocations() {
     CHK(arena.remaining() == 1024);
 }
 
-// Stats After End Frame
-// verifies currentUsed_ reflects restored offset after endFrame
+// Verifies rollback updates the current usage statistics.
 static void stats_after_end_frame() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<true> arena{1024};
     (void)arena.allocate(64, alignof(std::max_align_t));
 
     const std::size_t before = arena.used();
@@ -90,16 +86,15 @@ static void stats_after_end_frame() {
     CHK(arena.getStats().currentUsed_ == before);
 }
 
-// Scope Restores Frame
-// verifies ArenaScope automatically calls endFrame on destruction
+// Verifies ArenaScope automatically restores the previous frame.
 static void scope_restores_frame() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
     (void)arena.allocate(64, alignof(std::max_align_t));
 
     const std::size_t before = arena.used();
 
     {
-        AllocatorPro::ArenaScope scope{arena};
+        AllocatorPro::ArenaScope<false> scope{arena};
         (void)arena.allocate(256, alignof(std::max_align_t));
         CHK(arena.used() > before);
     }
@@ -107,20 +102,19 @@ static void scope_restores_frame() {
     CHK(arena.used() == before);
 }
 
-// Scope Nested
-// verifies nested ArenaScope instances restore offsets in correct order
+// Verifies nested ArenaScope objects unwind in reverse order.
 static void scope_nested() {
-    AllocatorPro::Arena arena{1024};
+    AllocatorPro::Arena<false> arena{1024};
 
     const std::size_t base = arena.used();
 
     {
-        AllocatorPro::ArenaScope outer{arena};
+        AllocatorPro::ArenaScope<false> outer{arena};
         (void)arena.allocate(128, alignof(std::max_align_t));
         const std::size_t mid = arena.used();
 
         {
-            AllocatorPro::ArenaScope inner{arena};
+            AllocatorPro::ArenaScope<false> inner{arena};
             (void)arena.allocate(128, alignof(std::max_align_t));
             CHK(arena.used() > mid);
         }
@@ -131,9 +125,8 @@ static void scope_nested() {
     CHK(arena.used() == base);
 }
 
-// Test Runner
 // Executes all frame management test cases.
-void run_frame_management_tests() {
+void run_frame_tests() {
     setTitle("Frame Management Tests");
 
     RUN(begin_frame_saves_offset);

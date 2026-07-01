@@ -3,26 +3,29 @@
 #include <iostream>
 
 void run_constructor_tests();
-void run_core_allocation_tests();
-void run_object_lifecycle_tests();
-void run_frame_management_tests();
-void run_state_management_tests();
+void run_move_tests();
+void run_memory_tests();
+void run_lifecycle_tests();
+void run_frame_tests();
+void run_state_tests();
 void run_introspection_tests();
+void run_stats_tests();
+void run_scope_tests();
 
 int main() {
     std::cout << "\n";
-    borderLine();
 
     run_constructor_tests();
-    run_core_allocation_tests();
-    run_object_lifecycle_tests();
-    run_frame_management_tests();
-    run_state_management_tests();
+    run_move_tests();
+    run_memory_tests();
+    run_lifecycle_tests();
+    run_frame_tests();
+    run_state_tests();
     run_introspection_tests();
+    run_stats_tests();
+    run_scope_tests();
 
     stats();
-
-    borderLine();
     std::cout << "\n";
 
     return 0;

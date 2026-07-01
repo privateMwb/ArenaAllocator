@@ -1,25 +1,20 @@
 
 #include <iostream>
 
-void run_constructor_benchmarks();
-void run_core_allocation_benchmarks();
-void run_object_lifecycle_benchmarks();
-void run_frame_management_benchmarks();
-void run_state_management_benchmarks();
-void run_introspection_benchmarks();
+void run_allocation_benchmarks();
+void run_lifecycle_benchmarks();
+void run_reset_benchmarks();
+void run_scope_benchmarks();
 
 int main() {
     std::cout << "\n";
 
-    run_constructor_benchmarks();
-    run_core_allocation_benchmarks();
-    run_object_lifecycle_benchmarks();
-    run_frame_management_benchmarks();
-    run_state_management_benchmarks();
-    run_introspection_benchmarks();
+    run_allocation_benchmarks();
+    run_lifecycle_benchmarks();
+    run_reset_benchmarks();
+    run_scope_benchmarks();
 
     std::cout << "\n";
-
     return 0;
 }
 

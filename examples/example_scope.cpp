@@ -1,12 +1,16 @@
-// example_scope.cpp
-// Demonstrates ArenaScope for automatic frame management
-// across nested scopes and multiple temporary allocation groups.
+// Example Scope
+//
+// Covers:
+// - Basic ArenaScope usage
+// - Nested ArenaScope rollback
+// - Sequential scopes in the same arena
+// - ArenaScope with object lifecycle
 
 #include "example_helper.h"
 
-#include <cstddef>
-
 using namespace AllocatorPro;
+
+namespace {
 
 struct Particle {
     float x_, y_, z_;
@@ -16,82 +20,132 @@ struct Particle {
         : x_(x), y_(y), z_(z), lifetime_(lifetime) {}
 };
 
+} // namespace
+
 int main() {
-    mainTitle("\nScope Examples");
+    mainTitle("\nArenaScope Examples");
     borderLine();
-    
-    Arena arena{4096};
 
-    // Persistent Allocation
-    setTitle("Persistent Allocation");
+    Arena<false> arena{4096};
 
-    int* persistent = arena.create<int>(42);
-    (void)persistent;
+    // Demonstrates how ArenaScope automatically restores the arena
+    // to its previous state when leaving scope.
+    setTitle("Basic Scope");
 
-    std::cout << "Used after persistent alloc : " << arena.used() << "\n\n";
+    (void)arena.allocate(64, alignof(std::max_align_t));
 
-    // Scoped Allocation
-    setTitle("Scoped Allocation");
-
-    std::cout << "Used before scope    : " << arena.used() << "\n";
+    std::cout << "Used before scope  : " << arena.used()       << "\n";
+    std::cout << "Frame depth before : " << arena.frameDepth() << "\n";
 
     {
-        ArenaScope scope{arena};
+        ArenaScope<false> scope{arena};
 
-        Particle* p1 = arena.create<Particle>(1.0f, 2.0f, 3.0f, 5.0f);
-        Particle* p2 = arena.create<Particle>(4.0f, 5.0f, 6.0f, 3.0f);
-        Particle* p3 = arena.create<Particle>(7.0f, 8.0f, 9.0f, 1.0f);
+        (void)arena.allocate(256, alignof(std::max_align_t));
+        (void)arena.allocate(128, alignof(std::max_align_t));
+
+        std::cout << "Used inside scope  : " << arena.used()       << "\n";
+        std::cout << "Frame depth inside : " << arena.frameDepth() << "\n";
+    }
+
+    std::cout << "Used after scope   : " << arena.used()       << "\n";
+    std::cout << "Frame depth after  : " << arena.frameDepth() << "\n\n";
+
+    // Shows that nested scopes restore memory independently,
+    // unwinding in reverse order.
+    setTitle("Nested Scopes");
+
+    arena.reset();
+
+    (void)arena.allocate(64, alignof(std::max_align_t));
+    const std::size_t base = arena.used();
+
+    std::cout << "Used at base             : " << base               << "\n";
+
+    {
+        ArenaScope<false> outer{arena};
+        (void)arena.allocate(256, alignof(std::max_align_t));
+        const std::size_t mid = arena.used();
+
+        std::cout << "Used inside outer scope  : " << mid                << "\n";
+        std::cout << "Frame depth (outer open) : " << arena.frameDepth() << "\n";
+
+        {
+            ArenaScope<false> inner{arena};
+            (void)arena.allocate(512, alignof(std::max_align_t));
+
+            std::cout << "Used inside inner scope  : " << arena.used()       << "\n";
+            std::cout << "Frame depth (inner open) : " << arena.frameDepth() << "\n";
+        }
+
+        std::cout << "Used after inner closed  : " << arena.used()       << "\n";
+        std::cout << "Frame depth (inner done) : " << arena.frameDepth() << "\n";
+    }
+
+    std::cout << "Used after outer closed  : " << arena.used()       << "\n";
+    std::cout << "Frame depth (outer done) : " << arena.frameDepth() << "\n\n";
+
+    // Demonstrates that independent scopes can be reused without
+    // affecting allocations outside their lifetime.
+    setTitle("Sequential Scopes");
+
+    arena.reset();
+
+    std::cout << "Frame depth at start : " << arena.frameDepth() << "\n";
+
+    {
+        ArenaScope<false> first{arena};
+        (void)arena.allocate(128, alignof(std::max_align_t));
+        std::cout << "Used inside first    : " << arena.used() << "\n";
+    }
+    std::cout << "Used after first     : " << arena.used() << "\n";
+
+    {
+        ArenaScope<false> second{arena};
+        (void)arena.allocate(256, alignof(std::max_align_t));
+        std::cout << "Used inside second   : " << arena.used() << "\n";
+    }
+    std::cout << "Used after second    : " << arena.used() << "\n";
+
+    {
+        ArenaScope<false> third{arena};
+        (void)arena.allocate(512, alignof(std::max_align_t));
+        std::cout << "Used inside third    : " << arena.used() << "\n";
+    }
+    std::cout << "Used after third     : " << arena.used() << "\n";
+    std::cout << "Frame depth at end   : " << arena.frameDepth() << "\n\n";
+
+    // Shows that ArenaScope rolls back temporary allocations while
+    // preserving objects allocated before the scope.
+    setTitle("Scope With Object Lifecycle");
+
+    arena.reset();
+
+    Particle* persistent = arena.create<Particle>(0.0f, 0.0f, 0.0f, -1.0f);
+    (void)persistent;
+
+    std::cout << "Used before scope (persistent particle) : " << arena.used() << "\n";
+
+    {
+        ArenaScope<false> scope{arena};
+
+        Particle* p1 = arena.create<Particle>(1.0f, 0.0f, 0.0f, 2.5f);
+        Particle* p2 = arena.create<Particle>(0.0f, 1.0f, 0.0f, 1.0f);
+        Particle* p3 = arena.create<Particle>(0.0f, 0.0f, 1.0f, 0.5f);
         (void)p1;
         (void)p2;
         (void)p3;
 
-        std::cout << "Used inside scope    : " << arena.used()    << "\n";
-        std::cout << "Particle 1 lifetime  : " << p1->lifetime_   << "\n";
-        std::cout << "Particle 2 lifetime  : " << p2->lifetime_   << "\n";
-        std::cout << "Particle 3 lifetime  : " << p3->lifetime_   << "\n";
+        std::cout << "Temp particles created               : " << 3            << "\n";
+        std::cout << "Used inside scope                    : " << arena.used() << "\n";
+
+        arena.destroy(p1);
+        arena.destroy(p2);
+        arena.destroy(p3);
     }
 
-    std::cout << "Used after scope     : " << arena.used() << "\n\n";
+    std::cout << "Used after scope (persistent remains): " << arena.used() << "\n";
 
-    // Nested Scopes
-    setTitle("Nested Scopes");
-
-    std::cout << "Used before outer scope      : " << arena.used() << "\n";
-
-    {
-        ArenaScope outer{arena};
-
-        Particle* wave1 = arena.create<Particle>(0.0f, 0.0f, 0.0f, 10.0f);
-        (void)wave1;
-
-        std::cout << "Used after outer alloc       : " << arena.used() << "\n";
-
-        {
-            ArenaScope inner{arena};
-
-            Particle* wave2 = arena.create<Particle>(1.0f, 1.0f, 1.0f, 2.0f);
-            (void)wave2;
-
-            std::cout << "Used inside inner scope      : " << arena.used() << "\n";
-        }
-
-        std::cout << "Used after inner scope exits : " << arena.used() << "\n";
-    }
-
-    std::cout << "Used after outer scope exits : " << arena.used() << "\n\n";
-
-    // Final Stats
-    setTitle("Final Stats");
-
-    const auto& s = arena.getStats();
-
-    std::cout << "Total allocated : " << s.totalAllocated_ << "\n";
-    std::cout << "Peak used       : " << s.peakUsed_       << "\n";
-    std::cout << "Allocations     : " << s.allocations_    << "\n";
-    
     borderLine();
     std::cout << "\n";
-
     return 0;
 }
-

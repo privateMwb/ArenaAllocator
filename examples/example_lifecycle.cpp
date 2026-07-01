@@ -1,82 +1,111 @@
-// example_lifecycle.cpp
-// Demonstrates object creation and destruction with non-trivial types,
-// and frame-based allocation for temporary object groups.
+// Example Lifecycle
+//
+// Covers:
+// - Trivial object creation and destruction
+// - Non-trivial object creation and destruction
+// - Multiple objects in a single arena
+// - ArenaScope automatic rollback
 
 #include "example_helper.h"
 
-#include <cstddef>
-
 using namespace AllocatorPro;
 
-struct Entity {
-    int         id_;
-    float       health_;
-    const char* name_;
+namespace {
 
-    Entity(int id, float health, const char* name)
-        : id_(id), health_(health), name_(name) {}
-
-    ~Entity() {}
+struct Vec3 {
+    float x_, y_, z_;
+    Vec3(float x, float y, float z) : x_(x), y_(y), z_(z) {}
+    ~Vec3() = default;
 };
 
+struct Node {
+    int   id_;
+    float weight_;
+    bool  active_;
+
+    Node(int id, float weight, bool active)
+        : id_(id), weight_(weight), active_(active) {}
+    ~Node() = default;
+};
+
+} // namespace
+
 int main() {
-    mainTitle("\nLifecycle Examples");
+    mainTitle("\nObject Lifecycle Examples");
     borderLine();
-    
-    Arena arena{2048};
 
-    // Object Creation
-    setTitle("Object Creation");
+    Arena<false> arena{4096};
 
-    Entity* e1 = arena.create<Entity>(1, 100.0f, "Warrior");
-    Entity* e2 = arena.create<Entity>(2, 80.0f,  "Mage");
-    Entity* e3 = arena.create<Entity>(3, 60.0f,  "Rogue");
+    // Creates and destroys a trivially destructible object.
+    setTitle("Trivial Type");
 
-    std::cout << "Entity 1          : " << e1->name_ << "\n";
-    std::cout << "Entity 2          : " << e2->name_ << "\n";
-    std::cout << "Entity 3          : " << e3->name_ << "\n";
-    std::cout << "Used after create : " << arena.used() << "\n\n";
+    int* counter = arena.create<int>(0);
+    *counter = 42;
 
-    // Object Destruction
-    setTitle("Object Destruction");
+    std::cout << "int value   : " << *counter << "\n";
+    std::cout << "Owns ptr    : " << arena.owns(counter) << "\n";
 
-    arena.destroy(e3);
+    arena.destroy(counter);
+    std::cout << "Destroyed   : true\n\n";
 
-    std::cout << "Used after destroy e3 : " << arena.used()     << "\n";
-    std::cout << "Capacity preserved    : " << arena.capacity() << "\n\n";
+    // Creates and destroys a user-defined object.
+    setTitle("Non-Trivial Type");
 
-    // Frame Allocation
-    setTitle("Frame Allocation");
+    Vec3* v = arena.create<Vec3>(1.0f, 2.0f, 3.0f);
 
-    std::cout << "Used before frame   : " << arena.used() << "\n";
+    std::cout << "Vec3.x : " << v->x_ << "\n";
+    std::cout << "Vec3.y : " << v->y_ << "\n";
+    std::cout << "Vec3.z : " << v->z_ << "\n";
 
-    arena.beginFrame();
+    arena.destroy(v);
+    std::cout << "Destroyed : true\n\n";
 
-    Entity* temp1 = arena.create<Entity>(10, 50.0f, "Temp Goblin");
-    Entity* temp2 = arena.create<Entity>(11, 30.0f, "Temp Orc");
-    (void)temp1;
-    (void)temp2;
+    // Allocates multiple objects from the same arena.
+    setTitle("Multiple Objects");
 
-    std::cout << "Used inside frame   : " << arena.used()   << "\n";
-    std::cout << "Temp entity 1       : " << temp1->name_   << "\n";
-    std::cout << "Temp entity 2       : " << temp2->name_   << "\n";
+    arena.reset();
 
-    arena.endFrame();
+    Node* n1 = arena.create<Node>(1, 0.5f, true);
+    Node* n2 = arena.create<Node>(2, 1.2f, false);
+    Node* n3 = arena.create<Node>(3, 0.8f, true);
 
-    std::cout << "Used after endFrame : " << arena.used() << "\n\n";
+    std::cout << "Node 1 — id: " << n1->id_ << "  weight: " << n1->weight_ << "  active: " << n1->active_ << "\n";
+    std::cout << "Node 2 — id: " << n2->id_ << "  weight: " << n2->weight_ << "  active: " << n2->active_ << "\n";
+    std::cout << "Node 3 — id: " << n3->id_ << "  weight: " << n3->weight_ << "  active: " << n3->active_ << "\n";
 
-    // Stats
-    setTitle("Stats");
+    std::cout << "Used after 3 nodes : " << arena.used() << "\n\n";
 
-    const auto& s = arena.getStats();
+    arena.destroy(n1);
+    arena.destroy(n2);
+    arena.destroy(n3);
 
-    std::cout << "Total allocated : " << s.totalAllocated_ << "\n";
-    std::cout << "Peak used       : " << s.peakUsed_       << "\n";
-    std::cout << "Allocations     : " << s.allocations_    << "\n";
-    
+    // Uses ArenaScope to automatically roll back temporary allocations.
+    setTitle("ArenaScope");
+
+    arena.reset();
+
+    Vec3* persistent = arena.create<Vec3>(0.0f, 1.0f, 0.0f);
+    (void)persistent;
+
+    std::cout << "Used before scope : " << arena.used() << "\n";
+    std::cout << "Frame depth       : " << arena.frameDepth() << "\n";
+
+    {
+        ArenaScope<false> scope{arena};
+
+        Vec3* temp1 = arena.create<Vec3>(1.0f, 0.0f, 0.0f);
+        Vec3* temp2 = arena.create<Vec3>(0.0f, 0.0f, 1.0f);
+        (void)temp1;
+        (void)temp2;
+
+        std::cout << "Used inside scope : " << arena.used() << "\n";
+        std::cout << "Frame depth       : " << arena.frameDepth() << "\n";
+    }
+
+    std::cout << "Used after scope  : " << arena.used() << "\n";
+    std::cout << "Frame depth       : " << arena.frameDepth() << "\n";
+
     borderLine();
     std::cout << "\n";
-
     return 0;
 }
-
