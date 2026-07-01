@@ -1,10 +1,10 @@
-# ArenaAllocator
+# Arena Allocator
 
-[![C++26](https://img.shields.io/badge/C%2B%2B-26-blue)](https://en.cppreference.com/w/cpp/26)
-[![Status](https://img.shields.io/badge/status-learning%20project-green)](https://github.com/privateMwb/ArenaAllocator)
+[![C++23](https://img.shields.io/badge/C%2B%2B-23-blue)](https://en.cppreference.com/w/cpp/23)
+[![Status](https://img.shields.io/badge/status-learning%20project-green)](https://github.com/privateMwb/ArenaPro)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A custom C++ arena allocator implementation built for learning low-level memory management, allocation strategies, frame-based lifetime control, and performance benchmarking.
+A custom C++ arena allocator implementation built for learning low-level memory management, bump pointer allocation strategies, nested frame-based rollback, and performance benchmarking.
 
 ---
 
@@ -27,16 +27,20 @@ A custom C++ arena allocator implementation built for learning low-level memory 
 
 ## Overview
 
-ArenaAllocator (`Arena`) is a linear/bump allocator implemented from scratch in modern C++ (C++26).
-It focuses on understanding how arena allocators work internally, including bump pointer allocation, frame-based lifetime management, and object lifecycle control.
+ArenaPro (`Arena`) is a linear bump pointer allocator implemented from scratch in modern C++ (C++23).
+It focuses on understanding how arena allocators work internally, including sequential bump pointer allocation, nested frame-based rollback, aligned memory management, and RAII scope guards.
 
 It also includes:
 
-- Typed allocation via `allocate<T>()`
-- Object construction and destruction via `create<T>()` / `destroy<T>()`
-- Frame stack for scoped memory lifetimes (`beginFrame` / `endFrame`)
-- RAII frame management via `ArenaScope`
-- Memory introspection via `owns()`, `view()`, and `getStats()`
+- Typed object construction and destruction via `create<T>()` / `destroy<T>()`
+- Typed storage allocation via `allocate<T>()`
+- Nested frame rollback via `beginFrame()` / `endFrame()`
+- RAII scope guard via `ArenaScope`
+- O(1) bulk reset via `reset()`
+- Ownership queries via `owns()`
+- Read-only memory view via `view()`
+- Frame depth introspection via `frameDepth()`
+- Optional debug statistics via `Arena<true>`
 - Benchmark suite comparing against heap (`new` / `delete`)
 - Unit tests for correctness validation
 
@@ -46,88 +50,109 @@ It also includes:
 
 This project was built to understand:
 
-- Linear/bump pointer allocation strategies
-- Frame-based memory lifetime management
-- RAII patterns applied to allocator design
-- Object lifecycle: construction and destruction without deallocation
-- Memory introspection and ownership queries
-- C++26 contracts for interface precondition enforcement
+- Linear bump pointer allocation strategies
+- Nested frame-based rollback without per-object metadata
+- Aligned memory management using `::operator new`
+- Object lifecycle: construction and destruction within an arena
+- RAII scope guard patterns for automatic frame unwinding
+- Optional compile-time statistics with zero overhead when disabled
 - Performance benchmarking vs heap allocation
 
 ---
 
 ## Features
 
-- Bump pointer allocation with alignment support
-- Typed allocation via `allocate<T>()`
-- Object creation with forwarded constructor arguments via `create<T>()`
+- O(1) allocation via bump pointer
+- O(1) frame rollback via offset restoration
+- Aligned allocation with configurable default and per-request alignment
+- Typed storage allocation via `allocate<T>()` — correctly aligned, uninitialized
+- Typed object creation with forwarded constructor arguments via `create<T>()`
 - Explicit destructor invocation via `destroy<T>()`
-- Frame stack with configurable depth (`kMaxFrameDepth = 8`)
-- RAII scoped frame management via `ArenaScope`
-- Full reset to reclaim the entire buffer in O(1)
+- RAII scope guard via `ArenaScope` for automatic frame rollback
+- Nested frame stack with configurable maximum depth (`kMaxFrameDepth_ = 8`)
+- Full reset to reclaim all memory in O(1) without calling destructors
 - Ownership query via `owns()`
-- Live memory view via `view()` returning `std::span<const std::byte>`
-- Debug statistics tracking via `getStats()`
+- Read-only memory view via `view()` returning `std::span<const std::byte>`
+- Frame depth introspection via `frameDepth()`
+- Optional debug statistics via `Arena<true>` with zero overhead when disabled
+- `[[no_unique_address]]` on stats storage — no size penalty when stats are off
 - Move semantics with deleted copy
-- C++26 contracts (`pre`) on all public functions
+- `std::constructible_from` concept constraint on `create<T>()`
 
 ---
 
 ## Design Overview
 
-Arena uses a single contiguous heap-allocated buffer with a bump pointer for allocation.
+Arena uses a single contiguous heap-allocated slab with a bump pointer for allocation and a fixed-depth frame stack for nested rollback.
 
 ### Internal Structure
 
 ```
 memory_ (pointer)
   ↓
-[byte][byte][byte][byte][byte][...]
-                   ↑
-                offset_       cap_
+[alloc 0][alloc 1][padding][alloc 2][alloc 3][...]
+                                              ↑
+                                           offset_
 ```
 
-- `memory_` → pointer to raw allocated buffer
-- `cap_` → total buffer size in bytes
-- `offset_` → current bump pointer position
-- `frameStack_` → saved offsets for frame rewind
-- `frameDepth_` → current frame stack depth
-- `stats_` → debug allocation statistics
+- `memory_`     → pointer to raw allocated slab
+- `cap_`        → total capacity in bytes
+- `offset_`     → current bump pointer position
+- `alignShift_` → log2 of the default alignment
+- `frameStack_` → fixed-depth array of saved offsets
+- `frameDepth_` → number of currently open frames
+- `stats_`      → optional debug statistics (zero-size when disabled)
 
 ### Allocation Strategy
 
-Allocation is a bump pointer advance with alignment:
+Allocation aligns the current offset and bumps it forward:
 
 ```cpp
-aligned = (offset_ + alignment - 1) & ~(alignment - 1);
-ptr     = memory_ + aligned;
-offset_ = aligned + size;
+const std::size_t aligned   = alignForward(offset_, toShift(requestAlignment));
+std::byte*        ptr       = memory_ + aligned;
+offset_                     = aligned + size;
+return ptr;
 ```
 
-No per-object metadata. No free list. No deallocation overhead.
+No heap traffic after construction. No per-allocation metadata.
 
-### Frame Management
+### Frame System
 
-Frames allow bulk rewind of the bump pointer:
+`beginFrame()` pushes the current offset onto an internal stack; `endFrame()` pops it:
 
+```cpp
+arena.beginFrame();    // save current position
+// ... allocations ...
+arena.endFrame();      // restore to saved position
 ```
-beginFrame()   → push offset_ onto frameStack_
-  allocate ...
-endFrame()     → pop offset_ from frameStack_ (rewind)
-```
 
-Up to `kMaxFrameDepth` (8) nested frames are supported. Frames can be managed manually or automatically via `ArenaScope`.
+All memory allocated after `beginFrame()` is reclaimed in O(1) on `endFrame()`.
+The frame stack enforces strict LIFO ordering and is capped at `kMaxFrameDepth_ = 8`.
 
 ### ArenaScope
 
-`ArenaScope` is a `[[nodiscard]]` RAII wrapper that calls `beginFrame()` on construction and `endFrame()` on destruction:
+`ArenaScope` is a RAII guard that calls `beginFrame()` on construction and `endFrame()` on destruction:
 
 ```cpp
 {
-    AllocatorPro::ArenaScope scope{arena};
-    // allocate temporary objects...
-} // endFrame() called automatically
+    ArenaScope scope{arena};
+    // ... allocations automatically rolled back on scope exit ...
+}
 ```
+
+Nested scopes unwind in LIFO order naturally.
+
+### Alignment Strategy
+
+Alignment is stored as a bit shift (`alignShift_`) rather than a raw value.
+This turns alignment math into a bitmask operation with no division:
+
+```cpp
+const std::size_t mask = (std::size_t{1} << shift) - 1u;
+return (ptr + mask) & ~mask;
+```
+
+`toShift()` uses `std::countr_zero` (C++20) for a branchless, constexpr-friendly conversion.
 
 ### Object Lifecycle
 
@@ -137,29 +162,34 @@ Up to `kMaxFrameDepth` (8) nested frames are supported. Frames can be managed ma
 T* obj = arena.create<T>(args...);
 ```
 
-`destroy<T>()` invokes the destructor without deallocating:
+`destroy<T>()` invokes the destructor without releasing memory:
 
 ```cpp
-arena.destroy(obj);
+arena.destroy(obj);   // destructor called, memory remains in arena
 ```
 
-Memory is reclaimed only via `reset()` or `endFrame()`.
+### Optional Statistics
 
-### Memory Introspection
+Statistics are controlled at compile time via the `EnableStats` template parameter:
 
+```cpp
+Arena<false> arena{1024};   // no stats — zero overhead
+Arena<true>  debug{1024};   // stats enabled
 ```
-owns(ptr)   → true if ptr is within [memory_, memory_ + cap_)
-view()      → std::span<const std::byte> over live portion [0, offset_)
-getStats()  → reference to Stats struct tracking allocations and usage
-```
+
+`[[no_unique_address]]` ensures the stats struct occupies zero bytes when disabled.
+
+The `statReset()` / `statDealloc()` split separates full stat clearing (`reset()`) from
+point-in-time usage updates (`endFrame()`), preserving lifetime counters across frame rollbacks.
 
 ### Exception Safety Model
 
-- `allocate()` returns `nullptr` on failure — no exceptions
-- `create()` returns `nullptr` if allocation fails
+- `allocate()` returns `nullptr` on exhaustion — no exceptions
+- `create<T>()` returns `nullptr` if allocation fails
 - Move operations are `noexcept`
-- `reset()`, `beginFrame()`, `endFrame()` are `noexcept`
-- C++26 `pre` contracts enforce caller obligations at function boundaries
+- `reset()`, `beginFrame()`, `endFrame()`, `destroy<T>()` are `noexcept`
+- `beginFrame()` is precondition-guarded — frame depth must be less than `kMaxFrameDepth_`
+- `endFrame()` is precondition-guarded — at least one frame must be open
 
 ---
 
@@ -167,101 +197,130 @@ getStats()  → reference to Stats struct tracking allocations and usage
 
 ### Time Complexity
 
-| Operation       | Complexity | Notes                                      |
-| --------------- | ---------- | ------------------------------------------ |
-| `allocate`      | O(1)       | Bump pointer advance with alignment        |
-| `allocate<T>`   | O(1)       | Typed wrapper over raw allocate            |
-| `create<T>`     | O(1)       | Allocation + placement construction        |
-| `destroy<T>`    | O(1)       | Destructor invocation only                 |
-| `beginFrame`    | O(1)       | Push offset onto frame stack               |
-| `endFrame`      | O(1)       | Pop and rewind bump pointer                |
-| `reset`         | O(1)       | Zero the offset — no per-object work       |
-| `owns`          | O(1)       | Pointer bounds check                       |
-| `view`          | O(1)       | Span construction over live buffer         |
-| `getStats`      | O(1)       | Reference return                           |
+| Operation      | Complexity | Notes                                   |
+| -------------- | ---------- | --------------------------------------- |
+| `allocate`     | O(1)       | Bump pointer + alignment mask           |
+| `allocate<T>`  | O(1)       | Typed wrapper — fully inlined           |
+| `beginFrame`   | O(1)       | Offset push onto fixed-depth stack      |
+| `endFrame`     | O(1)       | Offset pop and restore                  |
+| `create<T>`    | O(1)       | Allocation + placement construction     |
+| `destroy<T>`   | O(1)       | Destructor invocation only              |
+| `reset`        | O(1)       | Offset and frame depth reset to zero    |
+| `owns`         | O(1)       | Bounds check                            |
+| `view`         | O(1)       | Span construction over used range       |
+| `frameDepth`   | O(1)       | Member return                           |
+| `getStats`     | O(1)       | Reference return                        |
 
 ### Space Complexity
 
-- O(n) for the backing buffer
-- O(kMaxFrameDepth) for the frame stack (fixed at 8)
-- O(1) for all other metadata
+- O(n) for the backing slab (`size` bytes)
+- O(1) for all metadata
+- O(0) for stats when `EnableStats = false`
 
 ### Notes
 
-- No per-allocation overhead — no headers, no free list, no metadata
-- Memory is never released per-object; only `reset()` or `endFrame()` reclaim space
-- `destroy<T>()` invokes the destructor but does not reduce `offset_`
+- No per-allocation overhead — frame-based rollback requires no metadata per block
+- `reset()` does not call destructors — caller is responsible for object cleanup
+- `endFrame()` reclaims all memory allocated since `beginFrame()` in a single assignment
+- Alignment padding may consume bytes between allocations depending on request alignment
 
 ---
 
 ## Quick Example
 
-### Basic Allocation and Reset
+### Basic Allocation
 
 ```cpp
-#include "Arena.h"
+#include <ArenaPro/Arena.h>
 
 using namespace AllocatorPro;
 
 int main() {
-    Arena arena{1024};
+    Arena<> arena{1024};
 
-    void* p1 = arena.allocate(64, alignof(std::max_align_t));
-    void* p2 = arena.allocate(128, alignof(std::max_align_t));
+    std::byte* a = arena.allocate(128);
+    std::byte* b = arena.allocate(256);
+    (void)a;
+    (void)b;
 
-    int*    pi = arena.allocate<int>();
-    double* pd = arena.allocate<double>();
+    arena.reset();   // reclaim all memory in O(1)
+}
+```
 
-    arena.reset(); // reclaim everything in O(1)
+### Frame-Based Rollback
+
+```cpp
+#include <ArenaPro/Arena.h>
+
+using namespace AllocatorPro;
+
+int main() {
+    Arena<> arena{1024};
+
+    (void)arena.allocate(128);
+
+    arena.beginFrame();          // save current position
+    (void)arena.allocate(256);
+    arena.endFrame();            // restore to saved position
+}
+```
+
+### RAII Scope Guard
+
+```cpp
+#include <ArenaPro/Arena.h>
+#include <ArenaPro/ArenaScope.h>
+
+using namespace AllocatorPro;
+
+int main() {
+    Arena<> arena{1024};
+    (void)arena.allocate(128);
+
+    {
+        ArenaScope<false> scope{arena};
+        (void)arena.allocate(256);
+    }   // automatically rolled back on scope exit
 }
 ```
 
 ### Object Lifecycle
 
 ```cpp
-#include "Arena.h"
+#include <ArenaPro/Arena.h>
 
 using namespace AllocatorPro;
 
-struct Entity {
-    int id_; const char* name_;
-    Entity(int id, const char* name) : id_(id), name_(name) {}
-    ~Entity() {}
+struct Particle {
+    float x_, y_, z_;
+    Particle(float x, float y, float z) : x_(x), y_(y), z_(z) {}
+    ~Particle() {}
 };
 
 int main() {
-    Arena arena{2048};
+    Arena<> arena{1024};
 
-    Entity* e = arena.create<Entity>(1, "Warrior");
-
-    arena.destroy(e); // destructor called, memory stays in arena
-
-    arena.reset();    // reclaim all memory
+    Particle* p = arena.create<Particle>(1.0f, 2.0f, 3.0f);
+    arena.destroy(p);   // destructor called, memory remains in arena
+    arena.reset();      // reclaim all memory in O(1)
 }
 ```
 
-### Frame Management with ArenaScope
+### Debug Statistics
 
 ```cpp
-#include "Arena.h"
-#include "ArenaScope.h"
+#include <ArenaPro/Arena.h>
 
 using namespace AllocatorPro;
 
 int main() {
-    Arena arena{4096};
+    Arena<true> arena{1024};
 
-    int* persistent = arena.create<int>(42); // persists across frames
+    (void)arena.allocate(128);
+    (void)arena.allocate(256);
 
-    {
-        ArenaScope scope{arena}; // beginFrame()
-
-        int* temp1 = arena.create<int>(1);
-        int* temp2 = arena.create<int>(2);
-
-    } // endFrame() — temp1 and temp2 reclaimed automatically
-
-    arena.reset();
+    const auto& stats = arena.getStats();
+    // stats.allocations_, stats.totalAllocated_, stats.peakUsed_, stats.currentUsed_
 }
 ```
 
@@ -272,27 +331,31 @@ int main() {
 ### Constructors
 
 ```cpp
-Arena arena{size};              // allocates backing buffer of `size` bytes
-Arena b{std::move(a)};         // move construction — transfers ownership
-b = std::move(a);              // move assignment — transfers ownership
+Arena<> arena{size};                    // default alignment
+Arena<> arena{size, alignment};         // custom alignment
+Arena<> b{std::move(a)};               // move construction
+b = std::move(a);                      // move assignment
 ```
 
-### Core Allocation
+### Memory Management
 
 ```cpp
-void* allocate(std::size_t size, std::size_t alignment) noexcept;
+[[nodiscard]] std::byte* allocate(std::size_t size,
+    std::size_t request_alignment = alignof(std::max_align_t)) noexcept;
 
 template<typename T>
-T* allocate() noexcept;
+[[nodiscard]] T* allocate() noexcept;
 ```
 
 ### Object Lifecycle
 
 ```cpp
 template<typename T, typename... Args>
-T* create(Args&&... args);
+requires (!std::is_array_v<T>) && std::constructible_from<T, Args...>
+[[nodiscard]] T* create(Args&&... args);
 
 template<typename T>
+requires (!std::is_array_v<T>)
 void destroy(T* ptr) noexcept;
 ```
 
@@ -312,21 +375,22 @@ void reset() noexcept;
 ### Introspection
 
 ```cpp
-bool owns(const void* ptr) const noexcept;
+[[nodiscard]] bool owns(const void* ptr)              const noexcept;
+[[nodiscard]] std::span<const std::byte> view()       const noexcept;
 
-std::span<const std::byte> view() const noexcept;
+[[nodiscard]] const Stats& getStats() const noexcept requires EnableStats;
 
-const Stats& getStats() const noexcept;
-
-std::size_t capacity()  const noexcept;
-std::size_t used()      const noexcept;
-std::size_t remaining() const noexcept;
+[[nodiscard]] std::size_t used()        const noexcept;
+[[nodiscard]] std::size_t remaining()   const noexcept;
+[[nodiscard]] std::size_t capacity()    const noexcept;
+[[nodiscard]] std::size_t frameDepth()  const noexcept;
 ```
 
 ### ArenaScope
 
 ```cpp
-AllocatorPro::ArenaScope scope{arena}; // beginFrame on construct, endFrame on destruct
+ArenaScope<false> scope{arena};   // calls beginFrame on construction
+                                  // calls endFrame on destruction
 ```
 
 ---
@@ -336,210 +400,137 @@ AllocatorPro::ArenaScope scope{arena}; // beginFrame on construct, endFrame on d
 Benchmarks compare `Arena` against heap (`new` / `delete`) across all operations.
 All times are total elapsed time for the listed iteration count.
 
-> Compiled with `-std=c++26`. Results may vary depending on hardware and compiler optimizations.
+> Compiled with `-std=c++23`. Results may vary depending on hardware and compiler optimizations.
 
-### Constructor
-
-```
-----------------------------------------------------------------------
-Constructor Benchmarks                  Time           Iterations
-----------------------------------------------------------------------
-Arena Construct                         317.94 ms       1000000
-Heap Construct                          222.38 ms       1000000
-
-Arena Move Construct                    330.35 ms       1000000
-Heap Move Construct                     293.86 ms       1000000
-
-Arena Move Assign                       614.78 ms       1000000
-Heap Move Assign                        277.47 ms       1000000
-----------------------------------------------------------------------
-```
-
-### Core Allocation
+### Allocation
 
 ```
 ----------------------------------------------------------------------
-Core Allocation Benchmarks              Time           Iterations
+Allocation Benchmarks                   Time           Iteration
 ----------------------------------------------------------------------
-Arena Raw Allocate                      166.82 ms       1000000
-Heap Raw Allocate                       227.29 ms       1000000
+Arena Allocate                          3.56 ms         1000000
+Heap Allocate                           170.60 ms       1000000
 
-Arena Typed Allocate                    145.39 ms       500000
-Heap Typed Allocate                     89.55 ms        500000
+Arena Allocate Aligned                  3.28 ms         1000000
+Heap Allocate Aligned                   164.52 ms       1000000
 
-Arena Create                            148.98 ms       500000
-Heap Create                             228.44 ms       500000
-
-Arena Sequential                        57.41 ms        100000
-Heap Sequential                         348.28 ms       100000
-
-Arena Until Full                        43.69 ms        100000
-Heap Until Full                         292.47 ms       100000
+Arena Sequential                        6.15 ms         1000000
+Heap Sequential                         388.09 ms       1000000
 ----------------------------------------------------------------------
 ```
 
-### Object Lifecycle
+### Lifecycle
 
 ```
 ----------------------------------------------------------------------
-Object Lifecycle Benchmarks             Time           Iterations
+Object Lifecycle Benchmarks             Time           Iteration
 ----------------------------------------------------------------------
-Arena Create                            259.20 ms       1000000
-Heap Create                             169.78 ms       1000000
+Arena Create Trivial                    5.87 ms         1000000
+Heap Create Trivial                     169.09 ms       1000000
 
-Arena Destroy                           308.61 ms       1000000
-Heap Destroy                            120.75 ms       1000000
-
-Arena Create Destroy Cycle              145.39 ms       500000
-Heap Create Destroy Cycle               108.97 ms       500000
-
-Arena Multiple Creates                  28.37 ms        100000
-Heap Multiple Creates                   319.88 ms       100000
-
-Arena Create Probe                      91.48 ms        500000
-Heap Create Probe                       61.36 ms        500000
+Arena Create Non Trivial                5.90 ms         1000000
+Heap Create Non Trivial                 130.79 ms       1000000
 ----------------------------------------------------------------------
 ```
 
-### Frame Management
+### Reset
 
 ```
 ----------------------------------------------------------------------
-Frame Management Benchmarks             Time           Iterations
+Reset Benchmarks                        Time           Iteration
 ----------------------------------------------------------------------
-Arena Begin End Frame                   170.01 ms       1000000
-Heap Begin End Frame                    141.98 ms       1000000
+Arena Exhaustion Reset                  60.43 ms        1000000
+Heap Exhaustion Reset                   2.08 s          1000000
 
-Arena Scope                             169.22 ms       1000000
-Heap Scope                              226.52 ms       1000000
-
-Arena Nested Frames                     168.76 ms       500000
-Heap Nested Frames                      458.88 ms       500000
-
-Arena Frame With Allocs                 31.19 ms        100000
-Heap Frame With Allocs                  308.18 ms       100000
-
-Arena Scope With Allocs                 44.73 ms        100000
-Heap Scope With Allocs                  259.05 ms       100000
+Reset Stats Disabled                    60.01 ms        1000000
+Reset Stats Enabled                     58.90 ms        1000000
 ----------------------------------------------------------------------
 ```
 
-### State Management
+### Scope
 
 ```
 ----------------------------------------------------------------------
-State Management Benchmarks             Time           Iterations
+ArenaScope Benchmarks                   Time           Iteration
 ----------------------------------------------------------------------
-Arena Reset Single                      319.70 ms       1000000
-Heap Reset Single                       123.63 ms       1000000
+Arena Scope                             3.26 ms         1000000
+Arena Raw Frame                         3.26 ms         1000000
 
-Arena Reset Multiple                    113.59 ms       500000
-Heap Reset Multiple                     792.59 ms       500000
+Arena Scope Alloc                       3.25 ms         1000000
+Heap Alloc                              178.67 ms       1000000
 
-Arena Reset Reallocate                  141.48 ms       500000
-Heap Reset Reallocate                   280.73 ms       500000
-
-Arena Repeated Cycles                   19.79 ms        100000
-Heap Repeated Cycles                    99.35 ms        100000
-----------------------------------------------------------------------
-```
-
-### Introspection
-
-```
-----------------------------------------------------------------------
-Introspection Benchmarks                Time           Iterations
-----------------------------------------------------------------------
-Arena Owns                              2.65 ms         1000000
-Heap Owns                               324.12 ms       1000000
-
-Arena View                              2.63 ms         1000000
-Heap View                               1.07 ms         1000000
-
-Arena Get Stats                         2.11 ms         1000000
-Heap Get Stats                          1.07 ms         1000000
-
-Arena Capacity Used Remaining           5.80 ms         1000000
-Heap Capacity Used Remaining            526.46 us       1000000
+Arena Nested Scope                      8.71 ms         1000000
+Arena Nested Raw Frame                  8.67 ms         1000000
 ----------------------------------------------------------------------
 ```
 
 ### Summary
 
-Arena dominates wherever bulk patterns or batch lifetimes are involved.
-Sequential allocation (`Arena Sequential`: 57 ms vs `Heap Sequential`: 348 ms) and
-filling to capacity (`Arena Until Full`: 43 ms vs `Heap Until Full`: 292 ms) show
-the clearest wins — no per-allocation overhead means the gap widens with count.
+Arena dominates heap across every allocation pattern due to its O(1) bump pointer strategy
+and zero heap traffic after construction.
 
-Frame management tells the same story. Nested frames (`Arena Nested Frames`: 168 ms vs
-`Heap Nested Frames`: 458 ms) and frame/scope with allocations show 6–10x advantages
-because `endFrame` is a single pointer rewind vs N individual `delete` calls.
+Single allocation (`Arena Allocate`: 3.56 ms vs `Heap Allocate`: 170.60 ms) shows a 48x
+advantage — a bump pointer increment and mask vs heap search with fragmentation overhead.
 
-State management reinforces this — `reset` against multiple allocations
-(`Arena Reset Multiple`: 113 ms vs `Heap Reset Multiple`: 792 ms) is the starkest
-example of O(1) bulk reclaim vs O(n) heap deallocation.
+Aligned allocation (`Arena Allocate Aligned`: 3.28 ms vs `Heap Allocate Aligned`: 164.52 ms)
+shows a 50x advantage — alignment is a single bitmask operation stored as a bit shift,
+with no additional cost over unaligned allocation.
 
-Heap wins on single object operations. Single `create`/`destroy` cycles
-(`Arena Create`: 259 ms vs `Heap Create`: 169 ms) favor heap because the arena
-still pays construction cost without gaining anything from its bulk advantages.
-Introspection accessors (`owns`, `view`, `getStats`) are near-zero cost on both sides.
+Sequential allocations (`Arena Sequential`: 6.15 ms vs `Heap Sequential`: 388.09 ms)
+shows a 63x advantage — contiguous bump pointer vs three independent heap searches
+with fragmentation overhead per call.
 
-| Category             | Winner | Notes                                          |
-| -------------------- | ------ | ---------------------------------------------- |
-| Raw allocation       | Arena  | Bump pointer vs heap search                    |
-| Sequential creates   | Arena  | 6x faster — no per-object overhead             |
-| Bulk fill            | Arena  | 6x faster — single buffer, no fragmentation    |
-| Frame with allocs    | Arena  | 10x faster — endFrame vs N deletes             |
-| Scope with allocs    | Arena  | 5x faster — RAII rewind vs N deletes           |
-| Nested frames        | Arena  | 2.7x faster — stack rewind vs heap dealloc     |
-| Reset multiple       | Arena  | 7x faster — O(1) rewind vs O(n) delete         |
-| Single create        | Heap   | Arena pays construction with no bulk benefit   |
-| Single destroy       | Heap   | Heap dealloc faster without frame advantage    |
-| Introspection        | Tie    | Both near-zero cost                            |
+Exhaustion and reset (`Arena Exhaustion Reset`: 60.43 ms vs `Heap Exhaustion Reset`: 2.08 s)
+shows a 34x advantage — `reset()` is a single offset assignment and frame depth clear
+vs N individual heap deletes regardless of block count.
 
-**Use Arena when:** lifetimes are grouped, objects are short-lived, or bulk reset is needed.
-**Use heap when:** individual objects have independent lifetimes and are few in number.
+Scope overhead (`Arena Scope`: 3.26 ms vs `Arena Raw Frame`: 3.26 ms) is zero —
+the RAII wrapper adds no measurable cost compared to manual `beginFrame`/`endFrame`,
+both vastly outperforming heap at 178.67 ms.
+
+Stats overhead (`Reset Stats Disabled`: 60.01 ms vs `Reset Stats Enabled`: 58.90 ms)
+is negligible — the `if constexpr (EnableStats)` branch eliminates all stat overhead
+at compile time when disabled, and the enabled path adds no measurable cost.
+
+Non-trivial lifecycle (`Arena Create Non Trivial`: 5.90 ms vs
+`Heap Create Non Trivial`: 130.79 ms) shows a 22x advantage — the arena
+eliminates heap search entirely, paying only construction and destruction cost.
+
+| Category               | Winner | Notes                                              |
+| ---------------------- | ------ | -------------------------------------------------- |
+| Single allocate        | Arena  | 48x faster — bump pointer vs heap search           |
+| Aligned allocate       | Arena  | 50x faster — bitmask alignment vs heap overhead    |
+| Sequential allocations | Arena  | 63x faster — contiguous bump vs N heap calls       |
+| Exhaustion reset       | Arena  | 34x faster — single assignment vs N heap deletes   |
+| Trivial lifecycle      | Arena  | 29x faster — no heap traffic after construction    |
+| Non-trivial lifecycle  | Arena  | 22x faster — arena eliminates heap search entirely |
+| Scope vs raw frame     | Arena  | Zero RAII overhead — 3.26 ms vs 3.26 ms            |
+| Stats disabled vs on   | Arena  | Negligible overhead — compile-time elimination     |
+
+**Use Arena when:** allocation is linear, memory has natural frame lifetimes, or bulk reset patterns are needed.
+**Use heap when:** object lifetimes are independent, sizes vary unpredictably, or arbitrary deallocation order is required.
 
 ---
 
 ## Project Structure
 
 ```
-ArenaAllocator/
+ArenaPro/
 ├── include/
-│   ├── Arena.h
-│   ├── Arena.tpp
-│   └── ArenaScope.h
-│
-├── src/
-│   └── Arena.cpp
+│   └── ArenaPro/
+│       ├── Contract.h
+│       ├── Arena.h
+│       ├── Arena.tpp
+│       └── ArenaScope.h
 │
 ├── tests/
-│   ├── test_helper.h
-│   ├── test_all.cpp
-│   ├── test_constructor.cpp
-│   ├── test_core_allocation.cpp
-│   ├── test_object_lifecycle.cpp
-│   ├── test_frame_management.cpp
-│   ├── test_state_management.cpp
-│   └── test_introspection.cpp
-│
 ├── benchmarks/
-│   ├── benchmark_helper.h
-│   ├── bench_all.cpp
-│   ├── bench_constructor.cpp
-│   ├── bench_core_allocation.cpp
-│   ├── bench_object_lifecycle.cpp
-│   ├── bench_frame_management.cpp
-│   ├── bench_state_management.cpp
-│   └── bench_introspection.cpp
-│
 ├── examples/
-│   ├── example_helper.h
-│   ├── example_basic.cpp
-│   ├── example_lifecycle.cpp
-│   └── example_scope.cpp
 │
+├── cmake/
+│   └── ArenaProConfig.cmake.in
+│
+├── .gitignore
 ├── CMakeLists.txt
 ├── README.md
 └── LICENSE
@@ -551,7 +542,7 @@ ArenaAllocator/
 
 ### Requirements
 
-- GCC 16+ or Clang with C++26 support
+- GCC 16+ or Clang with C++23 support
 - CMake 3.20+
 
 ### Build
@@ -577,20 +568,24 @@ cmake --build .
 ### Run Examples
 
 ```bash
-./ex1   # example_basic
-./ex2   # example_lifecycle
-./ex3   # example_scope
+./example_basic
+./example_lifecycle
+./example_scope
+./example_stats
 ```
 
 ---
 
 ## Notes
 
-- Arena memory is never released per-object. Reclaim via `reset()` or `endFrame()`.
-- `destroy<T>()` calls the destructor but does not rewind the bump pointer.
-- `ArenaScope` is `[[nodiscard]]` — a discarded temporary would immediately call `endFrame()`.
-- C++26 contracts (`pre`) are active on all public functions. GCC 16 support is experimental.
-- The frame stack depth is fixed at `kMaxFrameDepth = 8`. Exceeding it is a contract violation.
+- `reset()` does not call destructors. Caller is responsible for destroying live objects before reset.
+- `endFrame()` reclaims all memory allocated since `beginFrame()` — objects in that range are not destroyed.
+- `destroy<T>()` calls the destructor but does not release memory — use `endFrame()` or `reset()` to reclaim.
+- `getStats()` is only callable on `Arena<true>` — calling it on `Arena<false>` is a compile error.
+- `ArenaScope` calls `beginFrame()` at construction — allocations made before the scope are preserved.
+- The frame stack is capped at `kMaxFrameDepth_ = 8` — exceeding this depth triggers a precondition failure.
+- Alignment padding between allocations may cause `used()` to exceed the sum of requested sizes.
+- `reset()` fully clears all statistics including lifetime counters — `endFrame()` only updates `currentUsed_`.
 
 ---
 
