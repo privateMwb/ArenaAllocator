@@ -22,11 +22,10 @@ int main() {
 
     const auto& s = arena.getStats();
 
-    dataFormat("Total allocated",  s.totalAllocated_);
-    dataFormat("Current used",     s.currentUsed_);
-    dataFormat("Peak used",        s.peakUsed_);
-    dataFormat("Allocations",      s.allocations_);
-    std::cout << "\n";
+    std::cout << "Total allocated : " << s.totalAllocated_ << "\n";
+    std::cout << "Current used    : " << s.currentUsed_    << "\n";
+    std::cout << "Peak used       : " << s.peakUsed_       << "\n";
+    std::cout << "Allocations     : " << s.allocations_    << "\n\n";
 
     // Shows how statistics change after several allocations.
     setTitle("After Allocation");
@@ -35,11 +34,10 @@ int main() {
     (void)arena.allocate(256, alignof(std::max_align_t));
     (void)arena.allocate(64,  alignof(std::max_align_t));
 
-    dataFormat("Total allocated",  s.totalAllocated_);
-    dataFormat("Current used",     s.currentUsed_);
-    dataFormat("Peak used",        s.peakUsed_);
-    dataFormat("Allocations",      s.allocations_);
-    std::cout << "\n";
+    std::cout << "Total allocated : " << s.totalAllocated_ << "\n";
+    std::cout << "Current used    : " << s.currentUsed_    << "\n";
+    std::cout << "Peak used       : " << s.peakUsed_       << "\n";
+    std::cout << "Allocations     : " << s.allocations_    << "\n\n";
 
     // Demonstrates that the peak watermark records the highest usage reached.
     setTitle("Peak Watermark");
@@ -50,10 +48,9 @@ int main() {
     (void)arena.allocate(1024, alignof(std::max_align_t));
     arena.endFrame();
 
-    dataFormat("Peak before frame",   peakBefore);
-    dataFormat("Peak after endFrame", s.peakUsed_);
-    dataFormat("Current used",        s.currentUsed_);
-    std::cout << "\n";
+    std::cout << "Peak before frame   : " << peakBefore    << "\n";
+    std::cout << "Peak after endFrame : " << s.peakUsed_   << "\n";
+    std::cout << "Current used        : " << s.currentUsed_ << "\n\n";
 
     // Shows that endFrame restores memory usage without resetting lifetime statistics.
     setTitle("After EndFrame");
@@ -65,26 +62,25 @@ int main() {
     (void)arena.allocate(512, alignof(std::max_align_t));
     arena.endFrame();
 
-    dataFormat("Allocations before",  allocsBefore);
-    dataFormat("Allocations after",   s.allocations_);
-    dataFormat("Total before",        totalBefore);
-    dataFormat("Total after",         s.totalAllocated_);
-    dataFormat("Current used",        s.currentUsed_);
-    std::cout << "\n";
+    std::cout << "Allocations before  : " << allocsBefore       << "\n";
+    std::cout << "Allocations after   : " << s.allocations_     << "\n";
+    std::cout << "Total before        : " << totalBefore         << "\n";
+    std::cout << "Total after         : " << s.totalAllocated_   << "\n";
+    std::cout << "Current used        : " << s.currentUsed_      << "\n\n";
 
     // Demonstrates that reset clears both arena memory and accumulated statistics.
     setTitle("After Reset");
 
-    dataFormat("Total allocated before", s.totalAllocated_);
-    dataFormat("Allocations before",     s.allocations_);
-    dataFormat("Peak before",            s.peakUsed_);
+    std::cout << "Total allocated before : " << s.totalAllocated_ << "\n";
+    std::cout << "Allocations before     : " << s.allocations_    << "\n";
+    std::cout << "Peak before            : " << s.peakUsed_       << "\n";
 
     arena.reset();
 
-    dataFormat("Total allocated after",  s.totalAllocated_);
-    dataFormat("Current used after",     s.currentUsed_);
-    dataFormat("Peak after",             s.peakUsed_);
-    dataFormat("Allocations after",      s.allocations_);
+    std::cout << "Total allocated after  : " << s.totalAllocated_ << "\n";
+    std::cout << "Current used after     : " << s.currentUsed_    << "\n";
+    std::cout << "Peak after             : " << s.peakUsed_       << "\n";
+    std::cout << "Allocations after      : " << s.allocations_    << "\n";
 
     borderLine();
     std::cout << "\n";
