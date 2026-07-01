@@ -515,7 +515,7 @@ eliminates heap search entirely, paying only construction and destruction cost.
 ## Project Structure
 
 ```
-ArenaPro/
+ArenaAllocator/
 ├── include/
 │   └── ArenaPro/
 │       ├── Contract.h
