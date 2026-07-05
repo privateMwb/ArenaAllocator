@@ -1,3 +1,19 @@
+# ============================================================
+# CMakeLists.txt
+# Build configuration for the ArenaPro library.
+# ============================================================
+#
+# Sections:
+#   1. C++ Configuration
+#   2. ArenaPro Library
+#   3. Tests
+#   4. Benchmarks
+#   5. Examples
+#   6. Installation
+#   7. Packaging
+#
+# ============================================================
+
 cmake_minimum_required(VERSION 3.20)
 
 project(
@@ -5,7 +21,6 @@ project(
     VERSION 1.0.0
     LANGUAGES CXX
 )
-
 
 # ============================================================================
 # C++ Configuration
@@ -15,7 +30,6 @@ project(
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
 
 # ============================================================================
 # ArenaPro (Header-only Library)
@@ -43,19 +57,22 @@ target_compile_features(
 # Tests
 # ============================================================================
 
+# Collect all test source files.
+file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
+)
+
 # Build the test executable.
 add_executable(
     tests
-    tests/test_all.cpp
-    tests/test_constructor.cpp
-    tests/test_move.cpp
-    tests/test_memory.cpp
-    tests/test_lifecycle.cpp
-    tests/test_frame.cpp
-    tests/test_state.cpp
-    tests/test_introspection.cpp
-    tests/test_stats.cpp
-    tests/test_scope.cpp
+    ${TEST_SOURCES}
+)
+
+# Allow simple test includes.
+target_include_directories(
+    tests
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests
 )
 
 # Link ArenaPro to the test executable.
@@ -65,19 +82,26 @@ target_link_libraries(
     ArenaPro
 )
 
-
 # ============================================================================
 # Benchmarks
 # ============================================================================
 
+# Collect all benchmark source files.
+file(GLOB_RECURSE BENCH_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/*.cpp"
+)
+
 # Build the benchmark executable.
 add_executable(
     benchmarks
-    benchmarks/bench_all.cpp
-    benchmarks/bench_allocation.cpp
-    benchmarks/bench_lifecycle.cpp
-    benchmarks/bench_reset.cpp
-    benchmarks/bench_scope.cpp
+    ${BENCH_SOURCES}
+)
+
+# Allow simple benchmark includes.
+target_include_directories(
+    benchmarks
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
 )
 
 # Link ArenaPro to the benchmark executable.
@@ -87,63 +111,34 @@ target_link_libraries(
     ArenaPro
 )
 
-
 # ============================================================================
 # Examples
 # ============================================================================
 
-# Build the basic usage example.
-add_executable(
-    example_basic
-    examples/example_basic.cpp
+# Collect all example source files.
+file(GLOB_RECURSE EXAMPLE_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp"
 )
 
-# Link ArenaPro to the basic usage example.
+# Build the example executable.
+add_executable(
+    examples
+    ${EXAMPLE_SOURCES}
+)
+
+# Allow simple example includes.
+target_include_directories(
+    examples
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples
+)
+
+# Link ArenaPro to the example executable.
 target_link_libraries(
-    example_basic
+    examples
     PRIVATE
     ArenaPro
 )
-
-# Build the object lifecycle example.
-add_executable(
-    example_lifecycle
-    examples/example_lifecycle.cpp
-)
-
-# Link ArenaPro to the object lifecycle example.
-target_link_libraries(
-    example_lifecycle
-    PRIVATE
-    ArenaPro
-)
-
-# Build the ArenaScope example.
-add_executable(
-    example_scope
-    examples/example_scope.cpp
-)
-
-# Link ArenaPro to the StackScope example.
-target_link_libraries(
-    example_scope
-    PRIVATE
-    ArenaPro
-)
-
-# Build the statistics example.
-add_executable(
-    example_stats
-    examples/example_stats.cpp
-)
-
-# Link ArenaPro to the statistics example.
-target_link_libraries(
-    example_stats
-    PRIVATE
-    ArenaPro
-)
-
 
 # ============================================================================
 # Installation
@@ -168,7 +163,6 @@ install(
     DIRECTORY include/
     DESTINATION include
 )
-
 
 # ============================================================================
 # Packaging
