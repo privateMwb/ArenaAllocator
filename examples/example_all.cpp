@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
     if (argc == 1) {
         for (const auto& suite : example_registry()) {
             std::cout << "\n";
-            setTitle(suite.name);
+            mainTitle(suite.name);
             suite.run();
         }
         std::cout << "\n";
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         if (toLower(suite.name) == toLower(requested) ||
             toLower(suite.id) == toLower(requested)) {
             std::cout << "\n";
-            setTitle(suite.name);
+            mainTitle(suite.name);
             suite.run();
             std::cout << "\n";
             return 0;
