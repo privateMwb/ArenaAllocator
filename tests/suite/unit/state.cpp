@@ -9,7 +9,7 @@
 // - allocator reuse
 // - frame state reset
 
-#include <common/framework.h>"
+#include <common/framework.h>
 
 // Verifies reset clears the allocation offset.
 static void reset_clears_offset() {
