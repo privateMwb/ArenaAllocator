@@ -1,45 +1,44 @@
+/**
+ * @file            Contract.h
+ * @brief           Contract-checking macros and compiler attributes shared
+ *                  across AllocatorPro.
+ *
+ * Centralizes the assert()-based precondition/postcondition/invariant
+ * macros used throughout the library, plus a couple of portable compiler
+ * attributes, so both can be swapped out globally in one place without
+ * touching call sites.
+ */
+
 #pragma once
 
 #include <cassert>
 
-// ============================================================================
-// AllocatorPro Contract Macros
-//
-// These macros document function contracts and internal assumptions.
-//
-// AP_PRE       - Preconditions that callers must satisfy.
-// AP_POST      - Postconditions guaranteed by the function.
-// AP_INVARIANT - Conditions that must always hold for an object's state.
-// AP_ASSERT    - Internal implementation assertions.
-//
-// By default, all contract macros map to assert(). Their implementation can
-// be replaced globally without modifying library source code.
-//
-// Compiler Attributes
-//
-// AP_PURE      - Indicates that a function has no observable side effects and
-//                its return value depends only on its arguments and/or object
-//                state. Enables additional compiler optimizations when
-//                supported.
-//
-// By default, all contract macros map to assert(). Their implementation can
-// be replaced globally without modifying library source code.
-//
-// In release builds (NDEBUG defined), all contract macros expand to no-ops.
-// Callers are responsible for satisfying preconditions unconditionally.
-//
-// Compiler Attributes
-// ============================================================================
+/**
+ * @brief Documents a function's preconditions. Callers must satisfy these.
+ * @details Expands to `assert(condition)`; compiles to nothing when
+ * `NDEBUG` is defined. Callers remain responsible for satisfying
+ * preconditions unconditionally, even in release builds.
+ */
+#define AP_PRE(condition) assert(condition)
 
-// Contract macros.
-#define AP_PRE(condition)        assert(condition)
-#define AP_POST(condition)       assert(condition)
-#define AP_INVARIANT(condition)  assert(condition)
-#define AP_ASSERT(condition)     assert(condition)
+/// @brief Documents a function's postconditions — guarantees it makes on return.
+#define AP_POST(condition) assert(condition)
 
-// Compiler attributes.
+/// @brief Documents a condition that must always hold for an object's state.
+#define AP_INVARIANT(condition) assert(condition)
+
+/// @brief Internal implementation sanity check, not part of any public contract.
+#define AP_ASSERT(condition) assert(condition)
+
+/**
+ * @brief Marks a function as free of observable side effects, with a
+ * return value depending only on its arguments and/or object state.
+ * @details Expands to `__attribute__((pure))` on GCC/Clang, enabling
+ * additional optimizations (e.g. common subexpression elimination across
+ * repeated calls); expands to nothing on compilers that don't support it.
+ */
 #if defined(__GNUC__) || defined(__clang__)
-    #define AP_PURE __attribute__((pure))
+#define AP_PURE __attribute__((pure))
 #else
-    #define AP_PURE
+#define AP_PURE
 #endif
