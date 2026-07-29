@@ -9,7 +9,7 @@
 
 #include <utility>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 

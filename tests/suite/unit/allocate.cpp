@@ -8,7 +8,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies a request that fits in the buffer succeeds.
 static void returns_pointer_within_capacity() {

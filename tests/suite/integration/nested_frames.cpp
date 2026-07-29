@@ -7,7 +7,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies each endFrame() in a three-level nest restores the cursor
 // to exactly where the matching beginFrame() opened it.

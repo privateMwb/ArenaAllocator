@@ -11,7 +11,7 @@
 
 #include <utility>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies the destination inherits the source's capacity, cursor, and frames.
 static void move_construct_transfers_state() {

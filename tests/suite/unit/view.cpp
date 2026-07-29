@@ -7,7 +7,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies the returned span's size equals used().
 static void span_size_matches_used() {

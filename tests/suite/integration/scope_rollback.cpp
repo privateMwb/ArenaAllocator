@@ -9,7 +9,7 @@
 
 #include <stdexcept>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies the scope's RAII frame tracks arena.frameDepth() correctly.
 static void opens_and_closes_frame_via_raii() {

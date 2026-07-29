@@ -12,7 +12,7 @@
 #include <thread>
 #include <vector>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 

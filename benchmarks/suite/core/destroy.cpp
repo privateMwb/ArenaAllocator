@@ -19,7 +19,7 @@
 
 #include <vector>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 // Sized well above the largest iteration tier (1M) plus headroom for

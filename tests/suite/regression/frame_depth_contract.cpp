@@ -16,7 +16,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // This mirrors Arena.h's private kMaxFrameDepth_ constant. Update
 // alongside it if it ever changes.

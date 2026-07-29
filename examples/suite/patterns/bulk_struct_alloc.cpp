@@ -8,7 +8,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 struct Particle {

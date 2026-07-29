@@ -11,7 +11,7 @@
 #include <thread>
 #include <vector>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies each thread's own arena/scope pair behaves correctly while
 // every other thread is doing the same thing concurrently.

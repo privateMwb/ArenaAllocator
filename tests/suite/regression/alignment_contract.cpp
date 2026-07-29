@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies requesting an alignment exactly equal to the arena's base
 // alignment succeeds and produces a correctly aligned pointer.

@@ -1,6 +1,6 @@
 /**
  * @file            Arena.tpp
- * @brief           Template implementation for AllocatorPro::Arena.
+ * @brief           Template implementation for ArenaPro::Arena.
  *
  * Out-of-line member definitions for the Arena bump-pointer allocator
  * declared in Arena.h. Included at the bottom of Arena.h — not meant to
@@ -9,7 +9,7 @@
 
 // ============================================================
 // Arena.tpp
-// Template implementation for AllocatorPro::Arena.
+// Template implementation for ArenaPro::Arena.
 // ============================================================
 //
 //  Sections:
@@ -28,7 +28,7 @@
 
 #include <bit>
 
-namespace AllocatorPro {
+namespace ArenaPro {
 
 // ============================================================
 //  Section 1 — Constructors & Destructor
@@ -332,9 +332,9 @@ template <bool EnableStats> constexpr void Arena<EnableStats>::statDealloc() noe
     }
 }
 
-} // namespace AllocatorPro
+} // namespace ArenaPro
 
 /// @brief Short alias so this library can be used as `rain::Arena`, matching
 /// the alias declared in Arena.h. Repeated here since this file may be
 /// inspected on its own.
-namespace rain = AllocatorPro;
+namespace rain = ArenaPro;

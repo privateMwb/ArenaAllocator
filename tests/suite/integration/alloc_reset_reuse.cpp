@@ -8,7 +8,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies reset() restores full capacity after the arena was filled.
 static void fill_to_capacity_then_reset_allows_reuse() {

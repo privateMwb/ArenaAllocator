@@ -7,7 +7,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies endFrame() restores the cursor to where beginFrame() opened it.
 static void rewinds_cursor_to_checkpoint() {

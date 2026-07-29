@@ -6,7 +6,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies beginFrame() increments frameDepth() by one.
 static void opens_frame_increments_depth() {

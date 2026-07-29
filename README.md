@@ -105,7 +105,7 @@ target_link_libraries(your_target PRIVATE ArenaPro::ArenaPro)
 #include <ArenaPro/Arena.h>
 
 int main() {
-    AllocatorPro::Arena<> arena(1024);
+    ArenaPro::Arena<> arena(1024);
 
     std::byte* raw = arena.allocate(64);         // raw bytes
     auto* widget = arena.create<Widget>(1, 2);   // constructed in place
@@ -120,8 +120,8 @@ Scratch work scoped to a single call, rolled back automatically:
 #include <ArenaPro/Arena.h>
 #include <ArenaPro/ArenaScope.h>
 
-void process(AllocatorPro::Arena<>& arena) {
-    AllocatorPro::ArenaScope scope(arena); // opens a frame
+void process(ArenaPro::Arena<>& arena) {
+    ArenaPro::ArenaScope scope(arena); // opens a frame
 
     arena.allocate(256); // scratch space for this call only
     // ... frame rolls back automatically when scope goes out of scope,
@@ -132,7 +132,7 @@ void process(AllocatorPro::Arena<>& arena) {
 Tracking usage with statistics enabled:
 
 ```cpp
-AllocatorPro::Arena<true> arena(4096); // EnableStats = true
+ArenaPro::Arena<true> arena(4096); // EnableStats = true
 
 arena.allocate(128);
 

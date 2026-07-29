@@ -15,7 +15,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies constructing with the smallest valid size still succeeds
 // and reports the expected state.

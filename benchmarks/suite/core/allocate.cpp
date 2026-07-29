@@ -16,7 +16,7 @@
 
 #include <memory_resource>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 constexpr std::size_t kCapacityBytes = 64 * 1024 * 1024;

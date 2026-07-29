@@ -29,7 +29,7 @@
 
 #include <ArenaPro/Contract.h>
 
-namespace AllocatorPro {
+namespace ArenaPro {
 
 /// @brief Forward declaration of the RAII arena frame scope helper. See ArenaScope.h.
 template <bool EnableStats> class ArenaScope;
@@ -295,12 +295,12 @@ template <bool EnableStats = false> class Arena {
     constexpr void statDealloc() noexcept;
 };
 
-} // namespace AllocatorPro
+} // namespace ArenaPro
 
 /// @brief Short alias so this library can be used as `rain::Arena`, while
 /// its true namespace (and all internal diagnostics) remains
-/// `AllocatorPro`. See ArenaScope.h and Contract.h for the same alias
+/// `ArenaPro`. See ArenaScope.h and Contract.h for the same alias
 /// applied to `rain::ArenaScope` and the `rain`-visible contract macros.
-namespace rain = AllocatorPro;
+namespace rain = ArenaPro;
 
 #include "Arena.tpp"

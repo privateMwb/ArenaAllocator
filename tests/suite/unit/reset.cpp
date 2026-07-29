@@ -7,7 +7,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies reset() zeroes both the cursor and the open-frame count.
 static void resets_cursor_and_depth() {

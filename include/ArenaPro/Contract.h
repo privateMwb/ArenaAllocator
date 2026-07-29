@@ -1,7 +1,7 @@
 /**
  * @file            Contract.h
  * @brief           Contract-checking macros and compiler attributes shared
- *                  across AllocatorPro.
+ *                  across ArenaPro.
  *
  * Centralizes the assert()-based precondition/postcondition/invariant
  * macros used throughout the library, plus a couple of portable compiler

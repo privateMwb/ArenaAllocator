@@ -13,7 +13,7 @@
 #include <thread>
 #include <vector>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies allocations from many threads, each serialized through the
 // same external mutex, never overlap and sum to the expected total.

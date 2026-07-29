@@ -10,7 +10,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 constexpr std::size_t kSize = 4096;

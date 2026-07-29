@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 

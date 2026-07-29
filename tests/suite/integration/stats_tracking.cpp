@@ -7,7 +7,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies totals and current usage stay correct through a mixed
 // sequence of plain allocations and a rolled-back frame.

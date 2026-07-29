@@ -9,7 +9,7 @@
 
 #include <stdexcept>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 namespace {
 

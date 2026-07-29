@@ -9,7 +9,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies used() starts at zero and grows with each allocation.
 static void used_reflects_allocations() {

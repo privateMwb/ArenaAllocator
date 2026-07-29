@@ -8,7 +8,7 @@
 
 #include <support/framework.h>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies a pointer returned by allocate() is reported as owned.
 static void live_allocation_is_owned() {

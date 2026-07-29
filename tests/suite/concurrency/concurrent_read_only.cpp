@@ -12,7 +12,7 @@
 #include <thread>
 #include <vector>
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies every read-only observer stays consistent across
 // concurrent, lock-free callers once the arena's state is settled.

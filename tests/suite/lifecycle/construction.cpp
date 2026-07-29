@@ -29,7 +29,7 @@
 #define ARENA_TESTS_UNDER_ASAN 0
 #endif
 
-using namespace AllocatorPro;
+using namespace ArenaPro;
 
 // Verifies a freshly constructed arena starts empty with the requested capacity.
 static void valid_size_constructs_correctly() {
