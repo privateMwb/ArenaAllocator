@@ -11,7 +11,7 @@
 # ============================================================
 
 PROJECT_NAME            = "ArenaPro"
-PROJECT_BRIEF           = "High-performance, header-only LRU cache with O(1) get/put/evict, backed by a pool-allocated intrusive list and hash table."
+PROJECT_BRIEF           = "High-performance, header-only bump-pointer memory arena with O(1) allocate/create, backed by frame-based RAII rollback via ArenaScope."
 
 OUTPUT_DIRECTORY        = .
 

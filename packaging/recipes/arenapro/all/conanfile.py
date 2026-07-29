@@ -15,14 +15,15 @@ class Conan(ConanFile):
     version = "1.0.0"
 
     url = "https://github.com/privateMwb/ArenaAllocator"
-    description = "High-performance, header-only LRU cache with O(1) get/put/evict, backed by a pool-allocated intrusive list and hash table."
+    description = "High-performance, header-only bump-pointer memory arena with O(1) allocate/create, backed by frame-based RAII rollback via ArenaScope."
     topics = (
-        "cache",
-        "lru",
-        "lru-cache",
+        "arena-allocator",
+        "memory-allocator",
+        "allocator",
         "cpp",
         "data-structure",
     )
+    
     # ──────────────────────────────────────────────────────────────
 
     # header-library, not "library": there's no compiled src/ArenaPro/*.cpp
