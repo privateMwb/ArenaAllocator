@@ -2,673 +2,673 @@
   {
     "suite": "Ownership",
     "operation": "owns() hit",
-    "total_ns": 3215,
+    "total_ns": 3646,
     "iterations": 10000,
-    "ns_per_op": 0.32
+    "ns_per_op": 0.36
   },
   {
     "suite": "Ownership",
     "operation": "owns() hit",
-    "total_ns": 30898,
+    "total_ns": 34891,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Ownership",
     "operation": "owns() hit",
-    "total_ns": 308328,
+    "total_ns": 348393,
     "iterations": 1000000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Ownership",
     "operation": "owns() miss",
-    "total_ns": 3126,
+    "total_ns": 3566,
     "iterations": 10000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.36
   },
   {
     "suite": "Ownership",
     "operation": "owns() miss",
-    "total_ns": 30868,
+    "total_ns": 34882,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Ownership",
     "operation": "owns() miss",
-    "total_ns": 334026,
+    "total_ns": 348392,
     "iterations": 1000000,
-    "ns_per_op": 0.33
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "used()",
-    "total_ns": 7795,
+    "total_ns": 3536,
     "iterations": 10000,
-    "ns_per_op": 0.78
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "used()",
-    "total_ns": 76093,
+    "total_ns": 73688,
     "iterations": 100000,
-    "ns_per_op": 0.76
+    "ns_per_op": 0.74
   },
   {
     "suite": "State Query",
     "operation": "used()",
-    "total_ns": 597680,
+    "total_ns": 361041,
     "iterations": 1000000,
-    "ns_per_op": 0.60
+    "ns_per_op": 0.36
   },
   {
     "suite": "State Query",
     "operation": "remaining()",
-    "total_ns": 3125,
+    "total_ns": 3535,
     "iterations": 10000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "remaining()",
-    "total_ns": 30868,
+    "total_ns": 34882,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "remaining()",
-    "total_ns": 308328,
+    "total_ns": 348383,
     "iterations": 1000000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "capacity()",
-    "total_ns": 3146,
+    "total_ns": 3536,
     "iterations": 10000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "capacity()",
-    "total_ns": 30878,
+    "total_ns": 34891,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "capacity()",
-    "total_ns": 335629,
+    "total_ns": 365268,
     "iterations": 1000000,
-    "ns_per_op": 0.34
+    "ns_per_op": 0.37
   },
   {
     "suite": "State Query",
     "operation": "frameDepth()",
-    "total_ns": 3146,
+    "total_ns": 3545,
     "iterations": 10000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "frameDepth()",
-    "total_ns": 33382,
+    "total_ns": 34891,
     "iterations": 100000,
-    "ns_per_op": 0.33
+    "ns_per_op": 0.35
   },
   {
     "suite": "State Query",
     "operation": "frameDepth()",
-    "total_ns": 329758,
-    "iterations": 1000000,
-    "ns_per_op": 0.33
-  },
-  {
-    "suite": "View Span",
-    "operation": "view() populated",
-    "total_ns": 7544,
-    "iterations": 10000,
-    "ns_per_op": 0.75
-  },
-  {
-    "suite": "View Span",
-    "operation": "view() populated",
-    "total_ns": 52830,
-    "iterations": 100000,
-    "ns_per_op": 0.53
-  },
-  {
-    "suite": "View Span",
-    "operation": "view() populated",
-    "total_ns": 349895,
+    "total_ns": 348392,
     "iterations": 1000000,
     "ns_per_op": 0.35
   },
   {
     "suite": "View Span",
-    "operation": "view() empty",
-    "total_ns": 3145,
+    "operation": "view() populated",
+    "total_ns": 3535,
     "iterations": 10000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
+  },
+  {
+    "suite": "View Span",
+    "operation": "view() populated",
+    "total_ns": 34881,
+    "iterations": 100000,
+    "ns_per_op": 0.35
+  },
+  {
+    "suite": "View Span",
+    "operation": "view() populated",
+    "total_ns": 362363,
+    "iterations": 1000000,
+    "ns_per_op": 0.36
   },
   {
     "suite": "View Span",
     "operation": "view() empty",
-    "total_ns": 30878,
-    "iterations": 100000,
-    "ns_per_op": 0.31
+    "total_ns": 3536,
+    "iterations": 10000,
+    "ns_per_op": 0.35
   },
   {
     "suite": "View Span",
     "operation": "view() empty",
-    "total_ns": 529983,
+    "total_ns": 34881,
+    "iterations": 100000,
+    "ns_per_op": 0.35
+  },
+  {
+    "suite": "View Span",
+    "operation": "view() empty",
+    "total_ns": 348382,
     "iterations": 1000000,
-    "ns_per_op": 0.53
+    "ns_per_op": 0.35
   },
   {
     "suite": "Allocate",
     "operation": "allocate() small",
-    "total_ns": 9317,
+    "total_ns": 10486,
     "iterations": 10000,
-    "ns_per_op": 0.93
+    "ns_per_op": 1.05
   },
   {
     "suite": "Allocate",
     "operation": "allocate() small",
-    "total_ns": 62497,
+    "total_ns": 69723,
     "iterations": 100000,
-    "ns_per_op": 0.62
+    "ns_per_op": 0.70
   },
   {
     "suite": "Allocate",
     "operation": "allocate() small",
-    "total_ns": 1112875,
+    "total_ns": 1411957,
     "iterations": 1000000,
-    "ns_per_op": 1.11
+    "ns_per_op": 1.41
   },
   {
     "suite": "Allocate",
     "operation": "allocate() large",
-    "total_ns": 9297,
+    "total_ns": 10606,
     "iterations": 10000,
-    "ns_per_op": 0.93
+    "ns_per_op": 1.06
   },
   {
     "suite": "Allocate",
     "operation": "allocate() large",
-    "total_ns": 61716,
+    "total_ns": 69732,
     "iterations": 100000,
-    "ns_per_op": 0.62
+    "ns_per_op": 0.70
   },
   {
     "suite": "Allocate",
     "operation": "allocate() large",
-    "total_ns": 680075,
+    "total_ns": 758766,
     "iterations": 1000000,
-    "ns_per_op": 0.68
+    "ns_per_op": 0.76
   },
   {
     "suite": "Allocate",
     "operation": "allocate() over-aligned",
-    "total_ns": 9317,
+    "total_ns": 10496,
     "iterations": 10000,
-    "ns_per_op": 0.93
+    "ns_per_op": 1.05
   },
   {
     "suite": "Allocate",
     "operation": "allocate() over-aligned",
-    "total_ns": 61715,
+    "total_ns": 69732,
     "iterations": 100000,
-    "ns_per_op": 0.62
+    "ns_per_op": 0.70
   },
   {
     "suite": "Allocate",
     "operation": "allocate() over-aligned",
-    "total_ns": 770384,
+    "total_ns": 963817,
     "iterations": 1000000,
-    "ns_per_op": 0.77
+    "ns_per_op": 0.96
   },
   {
     "suite": "Construct",
     "operation": "create<T>() trivial",
-    "total_ns": 148579,
+    "total_ns": 94118,
     "iterations": 10000,
-    "ns_per_op": 14.86
+    "ns_per_op": 9.41
   },
   {
     "suite": "Construct",
     "operation": "create<T>() trivial",
-    "total_ns": 102532,
+    "total_ns": 141609,
     "iterations": 100000,
-    "ns_per_op": 1.03
+    "ns_per_op": 1.42
   },
   {
     "suite": "Construct",
     "operation": "create<T>() trivial",
-    "total_ns": 1272814,
+    "total_ns": 1482300,
     "iterations": 1000000,
-    "ns_per_op": 1.27
+    "ns_per_op": 1.48
   },
   {
     "suite": "Construct",
     "operation": "create<T>() non-trivial",
-    "total_ns": 81793,
+    "total_ns": 72026,
     "iterations": 10000,
-    "ns_per_op": 8.18
+    "ns_per_op": 7.20
   },
   {
     "suite": "Construct",
     "operation": "create<T>() non-trivial",
-    "total_ns": 192060,
+    "total_ns": 186565,
     "iterations": 100000,
-    "ns_per_op": 1.92
+    "ns_per_op": 1.87
   },
   {
     "suite": "Construct",
     "operation": "create<T>() non-trivial",
-    "total_ns": 3030158,
+    "total_ns": 2607616,
     "iterations": 1000000,
-    "ns_per_op": 3.03
+    "ns_per_op": 2.61
   },
   {
     "suite": "Destroy",
     "operation": "destroy<T>() trivial",
-    "total_ns": 3948,
+    "total_ns": 3565,
     "iterations": 10000,
-    "ns_per_op": 0.39
+    "ns_per_op": 0.36
   },
   {
     "suite": "Destroy",
     "operation": "destroy<T>() trivial",
-    "total_ns": 30868,
+    "total_ns": 34881,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Destroy",
     "operation": "destroy<T>() trivial",
-    "total_ns": 320110,
+    "total_ns": 348392,
     "iterations": 1000000,
-    "ns_per_op": 0.32
+    "ns_per_op": 0.35
   },
   {
     "suite": "Destroy",
     "operation": "destroy<T>() non-trivial",
-    "total_ns": 3176,
+    "total_ns": 3556,
     "iterations": 10000,
-    "ns_per_op": 0.32
+    "ns_per_op": 0.36
   },
   {
     "suite": "Destroy",
     "operation": "destroy<T>() non-trivial",
-    "total_ns": 30878,
+    "total_ns": 34891,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Destroy",
     "operation": "destroy<T>() non-trivial",
-    "total_ns": 308307,
+    "total_ns": 348402,
     "iterations": 1000000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Reset Refill",
     "operation": "reset()",
-    "total_ns": 3166,
+    "total_ns": 3535,
     "iterations": 10000,
-    "ns_per_op": 0.32
+    "ns_per_op": 0.35
   },
   {
     "suite": "Reset Refill",
     "operation": "reset()",
-    "total_ns": 30878,
+    "total_ns": 34892,
     "iterations": 100000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Reset Refill",
     "operation": "reset()",
-    "total_ns": 308317,
+    "total_ns": 348392,
     "iterations": 1000000,
-    "ns_per_op": 0.31
+    "ns_per_op": 0.35
   },
   {
     "suite": "Reset Refill",
     "operation": "reset() + refill",
-    "total_ns": 986038,
+    "total_ns": 1100690,
     "iterations": 10000,
-    "ns_per_op": 98.60
+    "ns_per_op": 110.07
   },
   {
     "suite": "Reset Refill",
     "operation": "reset() + refill",
-    "total_ns": 10060739,
+    "total_ns": 11086859,
     "iterations": 100000,
-    "ns_per_op": 100.61
+    "ns_per_op": 110.87
   },
   {
     "suite": "Reset Refill",
     "operation": "reset() + refill",
-    "total_ns": 101671911,
+    "total_ns": 109221889,
     "iterations": 1000000,
-    "ns_per_op": 101.67
+    "ns_per_op": 109.22
   },
   {
     "suite": "Type Allocate",
     "operation": "allocate<T>() small type",
-    "total_ns": 9287,
+    "total_ns": 10495,
     "iterations": 10000,
-    "ns_per_op": 0.93
+    "ns_per_op": 1.05
   },
   {
     "suite": "Type Allocate",
     "operation": "allocate<T>() small type",
-    "total_ns": 61715,
+    "total_ns": 147598,
     "iterations": 100000,
-    "ns_per_op": 0.62
+    "ns_per_op": 1.48
   },
   {
     "suite": "Type Allocate",
     "operation": "allocate<T>() small type",
-    "total_ns": 813064,
+    "total_ns": 1186676,
     "iterations": 1000000,
-    "ns_per_op": 0.81
+    "ns_per_op": 1.19
   },
   {
     "suite": "Type Allocate",
     "operation": "allocate<T>() large type",
-    "total_ns": 9308,
+    "total_ns": 10486,
     "iterations": 10000,
-    "ns_per_op": 0.93
+    "ns_per_op": 1.05
   },
   {
     "suite": "Type Allocate",
     "operation": "allocate<T>() large type",
-    "total_ns": 61715,
+    "total_ns": 69722,
     "iterations": 100000,
-    "ns_per_op": 0.62
+    "ns_per_op": 0.70
   },
   {
     "suite": "Type Allocate",
     "operation": "allocate<T>() large type",
-    "total_ns": 821409,
+    "total_ns": 971910,
     "iterations": 1000000,
-    "ns_per_op": 0.82
+    "ns_per_op": 0.97
   },
   {
     "suite": "Construction",
     "operation": "construction",
-    "total_ns": 396122,
+    "total_ns": 404896,
     "iterations": 10000,
-    "ns_per_op": 39.61
+    "ns_per_op": 40.49
   },
   {
     "suite": "Construction",
     "operation": "construction",
-    "total_ns": 4009855,
+    "total_ns": 4082146,
     "iterations": 100000,
-    "ns_per_op": 40.10
+    "ns_per_op": 40.82
   },
   {
     "suite": "Construction",
     "operation": "construction",
-    "total_ns": 40120804,
+    "total_ns": 46420527,
     "iterations": 1000000,
-    "ns_per_op": 40.12
+    "ns_per_op": 46.42
   },
   {
     "suite": "Move",
     "operation": "move construct",
-    "total_ns": 395682,
+    "total_ns": 410264,
     "iterations": 10000,
-    "ns_per_op": 39.57
+    "ns_per_op": 41.03
   },
   {
     "suite": "Move",
     "operation": "move construct",
-    "total_ns": 3984668,
+    "total_ns": 4054085,
     "iterations": 100000,
-    "ns_per_op": 39.85
+    "ns_per_op": 40.54
   },
   {
     "suite": "Move",
     "operation": "move construct",
-    "total_ns": 39840399,
+    "total_ns": 40616177,
     "iterations": 1000000,
-    "ns_per_op": 39.84
+    "ns_per_op": 40.62
   },
   {
     "suite": "Move",
     "operation": "move assign",
-    "total_ns": 18905,
+    "total_ns": 21261,
     "iterations": 10000,
-    "ns_per_op": 1.89
+    "ns_per_op": 2.13
   },
   {
     "suite": "Move",
     "operation": "move assign",
-    "total_ns": 190026,
+    "total_ns": 218171,
     "iterations": 100000,
-    "ns_per_op": 1.90
+    "ns_per_op": 2.18
   },
   {
     "suite": "Move",
     "operation": "move assign",
-    "total_ns": 1880244,
+    "total_ns": 2112137,
     "iterations": 1000000,
-    "ns_per_op": 1.88
+    "ns_per_op": 2.11
   },
   {
     "suite": "Scope Raii",
     "operation": "ArenaScope construct/destruct",
-    "total_ns": 12954,
+    "total_ns": 13991,
     "iterations": 10000,
-    "ns_per_op": 1.30
+    "ns_per_op": 1.40
   },
   {
     "suite": "Scope Raii",
     "operation": "ArenaScope construct/destruct",
-    "total_ns": 131257,
+    "total_ns": 139545,
     "iterations": 100000,
-    "ns_per_op": 1.31
+    "ns_per_op": 1.40
   },
   {
     "suite": "Scope Raii",
     "operation": "ArenaScope construct/destruct",
-    "total_ns": 1305266,
+    "total_ns": 1403404,
     "iterations": 1000000,
-    "ns_per_op": 1.31
+    "ns_per_op": 1.40
   },
   {
     "suite": "Alignment Scaling",
     "operation": "allocate() 4-byte aligned",
-    "total_ns": 13105,
+    "total_ns": 13300,
     "iterations": 10000,
-    "ns_per_op": 1.31
+    "ns_per_op": 1.33
   },
   {
     "suite": "Alignment Scaling",
     "operation": "allocate() 4-byte aligned",
-    "total_ns": 164408,
+    "total_ns": 132425,
     "iterations": 100000,
-    "ns_per_op": 1.64
+    "ns_per_op": 1.32
   },
   {
     "suite": "Alignment Scaling",
     "operation": "allocate() 4-byte aligned",
-    "total_ns": 1336254,
+    "total_ns": 1333092,
     "iterations": 1000000,
-    "ns_per_op": 1.34
-  },
-  {
-    "suite": "Alignment Scaling",
-    "operation": "allocate() 64-byte aligned",
-    "total_ns": 13095,
-    "iterations": 10000,
-    "ns_per_op": 1.31
-  },
-  {
-    "suite": "Alignment Scaling",
-    "operation": "allocate() 64-byte aligned",
-    "total_ns": 132548,
-    "iterations": 100000,
     "ns_per_op": 1.33
   },
   {
     "suite": "Alignment Scaling",
     "operation": "allocate() 64-byte aligned",
-    "total_ns": 1355450,
-    "iterations": 1000000,
-    "ns_per_op": 1.36
-  },
-  {
-    "suite": "Alignment Scaling",
-    "operation": "allocate() 4096-byte aligned",
-    "total_ns": 13125,
+    "total_ns": 13300,
     "iterations": 10000,
-    "ns_per_op": 1.31
+    "ns_per_op": 1.33
   },
   {
     "suite": "Alignment Scaling",
-    "operation": "allocate() 4096-byte aligned",
-    "total_ns": 129292,
+    "operation": "allocate() 64-byte aligned",
+    "total_ns": 141799,
     "iterations": 100000,
-    "ns_per_op": 1.29
+    "ns_per_op": 1.42
+  },
+  {
+    "suite": "Alignment Scaling",
+    "operation": "allocate() 64-byte aligned",
+    "total_ns": 1339721,
+    "iterations": 1000000,
+    "ns_per_op": 1.34
   },
   {
     "suite": "Alignment Scaling",
     "operation": "allocate() 4096-byte aligned",
-    "total_ns": 1410874,
-    "iterations": 1000000,
-    "ns_per_op": 1.41
-  },
-  {
-    "suite": "Capacity Growth",
-    "operation": "allocate() 4 KiB buffer",
-    "total_ns": 25097,
+    "total_ns": 13300,
     "iterations": 10000,
-    "ns_per_op": 2.51
+    "ns_per_op": 1.33
   },
   {
-    "suite": "Capacity Growth",
-    "operation": "allocate() 4 KiB buffer",
-    "total_ns": 248897,
+    "suite": "Alignment Scaling",
+    "operation": "allocate() 4096-byte aligned",
+    "total_ns": 132414,
     "iterations": 100000,
-    "ns_per_op": 2.49
+    "ns_per_op": 1.32
+  },
+  {
+    "suite": "Alignment Scaling",
+    "operation": "allocate() 4096-byte aligned",
+    "total_ns": 1337809,
+    "iterations": 1000000,
+    "ns_per_op": 1.34
   },
   {
     "suite": "Capacity Growth",
     "operation": "allocate() 4 KiB buffer",
-    "total_ns": 2658112,
+    "total_ns": 22393,
+    "iterations": 10000,
+    "ns_per_op": 2.24
+  },
+  {
+    "suite": "Capacity Growth",
+    "operation": "allocate() 4 KiB buffer",
+    "total_ns": 193525,
+    "iterations": 100000,
+    "ns_per_op": 1.94
+  },
+  {
+    "suite": "Capacity Growth",
+    "operation": "allocate() 4 KiB buffer",
+    "total_ns": 1666902,
     "iterations": 1000000,
-    "ns_per_op": 2.66
+    "ns_per_op": 1.67
   },
   {
     "suite": "Capacity Growth",
     "operation": "allocate() 1 MiB buffer",
-    "total_ns": 13125,
+    "total_ns": 13309,
     "iterations": 10000,
-    "ns_per_op": 1.31
+    "ns_per_op": 1.33
   },
   {
     "suite": "Capacity Growth",
     "operation": "allocate() 1 MiB buffer",
-    "total_ns": 132478,
+    "total_ns": 178552,
+    "iterations": 100000,
+    "ns_per_op": 1.79
+  },
+  {
+    "suite": "Capacity Growth",
+    "operation": "allocate() 1 MiB buffer",
+    "total_ns": 1476952,
+    "iterations": 1000000,
+    "ns_per_op": 1.48
+  },
+  {
+    "suite": "Capacity Growth",
+    "operation": "allocate() 64 MiB buffer",
+    "total_ns": 13300,
+    "iterations": 10000,
+    "ns_per_op": 1.33
+  },
+  {
+    "suite": "Capacity Growth",
+    "operation": "allocate() 64 MiB buffer",
+    "total_ns": 132455,
     "iterations": 100000,
     "ns_per_op": 1.32
   },
   {
     "suite": "Capacity Growth",
-    "operation": "allocate() 1 MiB buffer",
-    "total_ns": 1391287,
-    "iterations": 1000000,
-    "ns_per_op": 1.39
-  },
-  {
-    "suite": "Capacity Growth",
     "operation": "allocate() 64 MiB buffer",
-    "total_ns": 13074,
-    "iterations": 10000,
-    "ns_per_op": 1.31
-  },
-  {
-    "suite": "Capacity Growth",
-    "operation": "allocate() 64 MiB buffer",
-    "total_ns": 159890,
-    "iterations": 100000,
-    "ns_per_op": 1.60
-  },
-  {
-    "suite": "Capacity Growth",
-    "operation": "allocate() 64 MiB buffer",
-    "total_ns": 1341644,
-    "iterations": 1000000,
-    "ns_per_op": 1.34
-  },
-  {
-    "suite": "Exhaustion",
-    "operation": "allocate() with room to spare",
-    "total_ns": 12984,
-    "iterations": 10000,
-    "ns_per_op": 1.30
-  },
-  {
-    "suite": "Exhaustion",
-    "operation": "allocate() with room to spare",
-    "total_ns": 133560,
-    "iterations": 100000,
-    "ns_per_op": 1.34
-  },
-  {
-    "suite": "Exhaustion",
-    "operation": "allocate() with room to spare",
-    "total_ns": 1355610,
+    "total_ns": 1362655,
     "iterations": 1000000,
     "ns_per_op": 1.36
   },
   {
     "suite": "Exhaustion",
-    "operation": "allocate() at capacity (failure path)",
-    "total_ns": 3146,
+    "operation": "allocate() with room to spare",
+    "total_ns": 13300,
     "iterations": 10000,
-    "ns_per_op": 0.31
+    "ns_per_op": 1.33
+  },
+  {
+    "suite": "Exhaustion",
+    "operation": "allocate() with room to spare",
+    "total_ns": 132455,
+    "iterations": 100000,
+    "ns_per_op": 1.32
+  },
+  {
+    "suite": "Exhaustion",
+    "operation": "allocate() with room to spare",
+    "total_ns": 1354994,
+    "iterations": 1000000,
+    "ns_per_op": 1.35
   },
   {
     "suite": "Exhaustion",
     "operation": "allocate() at capacity (failure path)",
-    "total_ns": 30888,
-    "iterations": 100000,
-    "ns_per_op": 0.31
+    "total_ns": 3535,
+    "iterations": 10000,
+    "ns_per_op": 0.35
   },
   {
     "suite": "Exhaustion",
     "operation": "allocate() at capacity (failure path)",
-    "total_ns": 308337,
-    "iterations": 1000000,
-    "ns_per_op": 0.31
-  },
-  {
-    "suite": "Stats",
-    "operation": "getStats()",
-    "total_ns": 6292,
-    "iterations": 10000,
-    "ns_per_op": 0.63
-  },
-  {
-    "suite": "Stats",
-    "operation": "getStats()",
-    "total_ns": 61766,
+    "total_ns": 34892,
     "iterations": 100000,
-    "ns_per_op": 0.62
+    "ns_per_op": 0.35
+  },
+  {
+    "suite": "Exhaustion",
+    "operation": "allocate() at capacity (failure path)",
+    "total_ns": 348392,
+    "iterations": 1000000,
+    "ns_per_op": 0.35
   },
   {
     "suite": "Stats",
     "operation": "getStats()",
-    "total_ns": 626334,
+    "total_ns": 7121,
+    "iterations": 10000,
+    "ns_per_op": 0.71
+  },
+  {
+    "suite": "Stats",
+    "operation": "getStats()",
+    "total_ns": 69712,
+    "iterations": 100000,
+    "ns_per_op": 0.70
+  },
+  {
+    "suite": "Stats",
+    "operation": "getStats()",
+    "total_ns": 706922,
     "iterations": 1000000,
-    "ns_per_op": 0.63
+    "ns_per_op": 0.71
   }
 ]
