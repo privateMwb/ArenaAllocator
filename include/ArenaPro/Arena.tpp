@@ -333,8 +333,3 @@ template <bool EnableStats> constexpr void Arena<EnableStats>::statDealloc() noe
 }
 
 } // namespace ArenaPro
-
-/// @brief Short alias so this library can be used as `rain::Arena`, matching
-/// the alias declared in Arena.h. Repeated here since this file may be
-/// inspected on its own.
-namespace rain = ArenaPro;

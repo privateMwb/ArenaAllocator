@@ -48,7 +48,3 @@ template <bool EnableStats> class [[nodiscard]] ArenaScope {
 };
 
 } // namespace ArenaPro
-
-/// @brief Short alias so this library can be used as `rain::ArenaScope`,
-/// matching the alias declared in Arena.h.
-namespace rain = ArenaPro;

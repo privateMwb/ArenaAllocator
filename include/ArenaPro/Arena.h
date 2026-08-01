@@ -297,10 +297,18 @@ template <bool EnableStats = false> class Arena {
 
 } // namespace ArenaPro
 
-/// @brief Short alias so this library can be used as `rain::Arena`, while
-/// its true namespace (and all internal diagnostics) remains
-/// `ArenaPro`. See ArenaScope.h and Contract.h for the same alias
-/// applied to `rain::ArenaScope` and the `rain`-visible contract macros.
-namespace rain = ArenaPro;
+/// @brief Umbrella alias so this library's types are reachable as
+/// `rain::Arena`, alongside every other project library, while its true
+/// namespace (and all internal diagnostics) remains `ArenaPro`. Reopens
+/// `rain` rather than aliasing it, since multiple libraries each contribute
+/// their own names into the same `rain` namespace -- an alias
+/// (`namespace rain = ArenaPro;`) can only ever bind to one target and
+/// collides the moment a second library declares its own `rain` alias to
+/// something else. Declared here only; ArenaScope.h includes this header
+/// directly, so `rain::ArenaScope` is already reachable through it and
+/// doesn't need its own declaration.
+namespace rain {
+using namespace ArenaPro;
+}
 
 #include "Arena.tpp"
