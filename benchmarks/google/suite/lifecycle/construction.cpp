@@ -37,7 +37,14 @@ BENCHMARK(ConstructionArena);
 static void ConstructionStd(benchmark::State& state) {
     for (auto _ : state) {
         stdArena a(kCapacityBytes);
-        benchmark::DoNotOptimize(a);
+        // Pass the address, not the object: GCC rejects DoNotOptimize(a)
+        // here because std::pmr::monotonic_buffer_resource has a const
+        // member, which GCC treats as read-only for the asm output that
+        // DoNotOptimize(Tp&) uses ("read-only reference used as 'asm'
+        // output"). The pointer overload has no such restriction, and
+        // ClobberMemory() keeps the construction from being optimized away.
+        benchmark::DoNotOptimize(&a);
+        benchmark::ClobberMemory();
     }
 }
 BENCHMARK(ConstructionStd);
