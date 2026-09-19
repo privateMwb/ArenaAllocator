@@ -2,11 +2,22 @@
  * @file            Contract.h
  * @brief           Contract-checking macros and compiler attributes shared
  *                  across ArenaPro.
+ * @details         Centralizes the assert()-based precondition/postcondition/
+ *                  invariant macros used throughout the library, plus a couple
+ *                  of portable compiler attributes, so both can be swapped out
+ *                  globally in one place without touching call sites.
  *
- * Centralizes the assert()-based precondition/postcondition/invariant
- * macros used throughout the library, plus a couple of portable compiler
- * attributes, so both can be swapped out globally in one place without
- * touching call sites.
+ * @date            2026-07-28
+ *
+ * @version         1.0.0
+ *
+ * @copyright       Copyright (c) 2026 privateMwb
+ *                  All rights reserved.
+ *                  https://github.com/privateMwb/ArenaAllocator
+ *
+ * @attention       This source is released under the MIT license
+ *                  SPDX-License-Identifier: MIT
+ *                  <http://opensource.org/licenses/MIT>
  */
 
 #pragma once
