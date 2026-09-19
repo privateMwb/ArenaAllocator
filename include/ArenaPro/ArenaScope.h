@@ -1,10 +1,21 @@
 /**
  * @file            ArenaScope.h
  * @brief           RAII helper that manages an Arena frame's lifetime.
+ * @details         A small scope guard used to pair every beginFrame() with an
+ *                  endFrame(), even when the guarded code throws or returns
+ *                  early. See Arena.h for the frame mechanism itself.
  *
- * A small scope guard used to pair every beginFrame() with an endFrame(),
- * even when the guarded code throws or returns early. See Arena.h for the
- * frame mechanism itself.
+ * @date            2026-07-28
+ *
+ * @version         1.0.0
+ *
+ * @copyright       Copyright (c) 2026 privateMwb
+ *                  All rights reserved.
+ *                  https://github.com/privateMwb/ArenaAllocator
+ *
+ * @attention       This source is released under the MIT license
+ *                  SPDX-License-Identifier: MIT
+ *                  <http://opensource.org/licenses/MIT>
  */
 
 #pragma once
