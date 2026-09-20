@@ -50,7 +50,7 @@ constexpr std::size_t kIterations = 1'000'000;
 } // namespace
 
 // Measures Arena allocate() cost in a 4 KiB buffer.
-static void CapacitySmallArena(benchmark::State& state) {
+static void capacity_small_arena(benchmark::State& state) {
     Arena<false> cSrc(kSmallCapacity);
 
     for (auto _ : state) {
@@ -59,19 +59,19 @@ static void CapacitySmallArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(CapacitySmallArena)->Iterations(kIterations);
+BENCHMARK(capacity_small_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() cost in a 4 KiB buffer.
-static void CapacitySmallStd(benchmark::State& state) {
+static void capacity_small_std(benchmark::State& state) {
     stdArena sSrc(kSmallCapacity);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize));
 }
-BENCHMARK(CapacitySmallStd)->Iterations(kIterations);
+BENCHMARK(capacity_small_std)->Iterations(kIterations);
 
 // Measures Arena allocate() cost in a 1 MiB buffer.
-static void CapacityMediumArena(benchmark::State& state) {
+static void capacity_medium_arena(benchmark::State& state) {
     Arena<false> cSrc(kMediumCapacity);
 
     for (auto _ : state) {
@@ -80,19 +80,19 @@ static void CapacityMediumArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(CapacityMediumArena)->Iterations(kIterations);
+BENCHMARK(capacity_medium_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() cost in a 1 MiB buffer.
-static void CapacityMediumStd(benchmark::State& state) {
+static void capacity_medium_std(benchmark::State& state) {
     stdArena sSrc(kMediumCapacity);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize));
 }
-BENCHMARK(CapacityMediumStd)->Iterations(kIterations);
+BENCHMARK(capacity_medium_std)->Iterations(kIterations);
 
 // Measures Arena allocate() cost in a 64 MiB buffer.
-static void CapacityLargeArena(benchmark::State& state) {
+static void capacity_large_arena(benchmark::State& state) {
     Arena<false> cSrc(kLargeCapacity);
 
     for (auto _ : state) {
@@ -101,13 +101,13 @@ static void CapacityLargeArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(CapacityLargeArena)->Iterations(kIterations);
+BENCHMARK(capacity_large_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() cost in a 64 MiB buffer.
-static void CapacityLargeStd(benchmark::State& state) {
+static void capacity_large_std(benchmark::State& state) {
     stdArena sSrc(kLargeCapacity);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize));
 }
-BENCHMARK(CapacityLargeStd)->Iterations(kIterations);
+BENCHMARK(capacity_large_std)->Iterations(kIterations);

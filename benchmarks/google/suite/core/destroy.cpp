@@ -51,7 +51,7 @@ static_assert(kIterations * sizeof(NonTrivial) <= kCapacityBytes,
 } // namespace
 
 // Measures Arena destroy<T>() for a type with a trivial destructor.
-static void DestroyTrivialArena(benchmark::State& state) {
+static void destroy_trivial_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     std::vector<Trivial*> pool(kIterations);
@@ -62,11 +62,11 @@ static void DestroyTrivialArena(benchmark::State& state) {
     for (auto _ : state)
         cSrc.destroy(pool[idx++]);
 }
-BENCHMARK(DestroyTrivialArena)->Iterations(kIterations);
+BENCHMARK(destroy_trivial_arena)->Iterations(kIterations);
 
 // Measures the stdArena equivalent (direct destructor call) for a type
 // with a trivial destructor.
-static void DestroyTrivialStd(benchmark::State& state) {
+static void destroy_trivial_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     std::vector<Trivial*> pool(kIterations);
@@ -79,10 +79,10 @@ static void DestroyTrivialStd(benchmark::State& state) {
     for (auto _ : state)
         pool[idx++]->~Trivial();
 }
-BENCHMARK(DestroyTrivialStd)->Iterations(kIterations);
+BENCHMARK(destroy_trivial_std)->Iterations(kIterations);
 
 // Measures Arena destroy<T>() for a type with a non-trivial destructor.
-static void DestroyNonTrivialArena(benchmark::State& state) {
+static void destroy_non_trivial_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     std::vector<NonTrivial*> pool(kIterations);
@@ -93,11 +93,11 @@ static void DestroyNonTrivialArena(benchmark::State& state) {
     for (auto _ : state)
         cSrc.destroy(pool[idx++]);
 }
-BENCHMARK(DestroyNonTrivialArena)->Iterations(kIterations);
+BENCHMARK(destroy_non_trivial_arena)->Iterations(kIterations);
 
 // Measures the stdArena equivalent (direct destructor call) for a type
 // with a non-trivial destructor.
-static void DestroyNonTrivialStd(benchmark::State& state) {
+static void destroy_non_trivial_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     std::vector<NonTrivial*> pool(kIterations);
@@ -110,4 +110,4 @@ static void DestroyNonTrivialStd(benchmark::State& state) {
     for (auto _ : state)
         pool[idx++]->~NonTrivial();
 }
-BENCHMARK(DestroyNonTrivialStd)->Iterations(kIterations);
+BENCHMARK(destroy_non_trivial_std)->Iterations(kIterations);

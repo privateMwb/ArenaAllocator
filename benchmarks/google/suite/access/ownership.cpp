@@ -23,7 +23,7 @@ constexpr std::size_t kSize = 4096;
 } // namespace
 
 // Measures owns() on a pointer allocated from the arena.
-static void OwnsHit(benchmark::State& state) {
+static void owns_hit(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     std::byte* ptr = aSrc.allocate(sizeof(int));
 
@@ -32,10 +32,10 @@ static void OwnsHit(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(OwnsHit);
+BENCHMARK(owns_hit);
 
 // Measures owns() on a pointer that does not belong to the arena.
-static void OwnsMiss(benchmark::State& state) {
+static void owns_miss(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     (void)aSrc.allocate(sizeof(int));
 
@@ -47,4 +47,4 @@ static void OwnsMiss(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(OwnsMiss);
+BENCHMARK(owns_miss);

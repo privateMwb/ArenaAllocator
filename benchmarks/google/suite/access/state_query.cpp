@@ -24,7 +24,7 @@ constexpr std::size_t kSize = 4096;
 } // namespace
 
 // Measures used().
-static void Used(benchmark::State& state) {
+static void used(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     benchmark::DoNotOptimize(aSrc.allocate(64));
 
@@ -33,10 +33,10 @@ static void Used(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(Used);
+BENCHMARK(used);
 
 // Measures remaining().
-static void Remaining(benchmark::State& state) {
+static void remaining(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     benchmark::DoNotOptimize(aSrc.allocate(64));
 
@@ -45,10 +45,10 @@ static void Remaining(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(Remaining);
+BENCHMARK(remaining);
 
 // Measures capacity().
-static void Capacity(benchmark::State& state) {
+static void capacity(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     benchmark::DoNotOptimize(aSrc.allocate(64));
 
@@ -57,10 +57,10 @@ static void Capacity(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(Capacity);
+BENCHMARK(capacity);
 
 // Measures frameDepth() with nested frames open.
-static void FrameDepth(benchmark::State& state) {
+static void frame_depth(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     aSrc.beginFrame();
     aSrc.beginFrame();
@@ -71,4 +71,4 @@ static void FrameDepth(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(FrameDepth);
+BENCHMARK(frame_depth);

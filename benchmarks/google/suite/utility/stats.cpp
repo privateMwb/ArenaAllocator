@@ -22,7 +22,7 @@ constexpr std::size_t kSize = 4096;
 } // namespace
 
 // Measures getStats() on an arena with a nonzero allocation history.
-static void GetStats(benchmark::State& state) {
+static void get_stats(benchmark::State& state) {
     Arena<true> aSrc(kSize);
     benchmark::DoNotOptimize(aSrc.allocate(64));
     benchmark::DoNotOptimize(aSrc.allocate(128));
@@ -33,4 +33,4 @@ static void GetStats(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(GetStats);
+BENCHMARK(get_stats);

@@ -30,7 +30,7 @@ constexpr std::size_t kEntrySize = sizeof(int);
 } // namespace
 
 // Measures the bare Arena reset() call in isolation.
-static void ResetArena(benchmark::State& state) {
+static void reset_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (std::size_t i = 0; i < kCycleSize; ++i)
@@ -39,10 +39,10 @@ static void ResetArena(benchmark::State& state) {
     for (auto _ : state)
         cSrc.reset();
 }
-BENCHMARK(ResetArena);
+BENCHMARK(reset_arena);
 
 // Measures the bare stdArena release() call in isolation.
-static void ResetStd(benchmark::State& state) {
+static void reset_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (std::size_t i = 0; i < kCycleSize; ++i)
@@ -51,11 +51,11 @@ static void ResetStd(benchmark::State& state) {
     for (auto _ : state)
         sSrc.release();
 }
-BENCHMARK(ResetStd);
+BENCHMARK(reset_std);
 
 // Measures a full Arena reset-then-refill cycle: empty a full arena,
 // then refill it back to kCycleSize entries.
-static void ResetRefillArena(benchmark::State& state) {
+static void reset_refill_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (std::size_t i = 0; i < kCycleSize; ++i)
@@ -67,10 +67,10 @@ static void ResetRefillArena(benchmark::State& state) {
             benchmark::DoNotOptimize(cSrc.allocate(kEntrySize));
     }
 }
-BENCHMARK(ResetRefillArena);
+BENCHMARK(reset_refill_arena);
 
 // Measures a full stdArena release-then-refill cycle.
-static void ResetRefillStd(benchmark::State& state) {
+static void reset_refill_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (std::size_t i = 0; i < kCycleSize; ++i)
@@ -82,4 +82,4 @@ static void ResetRefillStd(benchmark::State& state) {
             benchmark::DoNotOptimize(sSrc.allocate(kEntrySize));
     }
 }
-BENCHMARK(ResetRefillStd);
+BENCHMARK(reset_refill_std);

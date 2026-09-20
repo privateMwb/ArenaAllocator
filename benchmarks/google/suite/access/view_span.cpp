@@ -22,7 +22,7 @@ constexpr std::size_t kSize = 4096;
 } // namespace
 
 // Measures view() over an arena with data already allocated.
-static void ViewPopulated(benchmark::State& state) {
+static void view_populated(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     benchmark::DoNotOptimize(aSrc.allocate(256));
 
@@ -31,10 +31,10 @@ static void ViewPopulated(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(ViewPopulated);
+BENCHMARK(view_populated);
 
 // Measures view() over a freshly constructed, empty arena.
-static void ViewEmpty(benchmark::State& state) {
+static void view_empty(benchmark::State& state) {
     Arena<false> aSrc(kSize);
 
     for (auto _ : state) {
@@ -42,4 +42,4 @@ static void ViewEmpty(benchmark::State& state) {
         benchmark::DoNotOptimize(v);
     }
 }
-BENCHMARK(ViewEmpty);
+BENCHMARK(view_empty);

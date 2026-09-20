@@ -25,26 +25,19 @@ constexpr std::size_t kCapacityBytes = 4096;
 } // namespace
 
 // Measures constructing an empty, unused Arena.
-static void ConstructionArena(benchmark::State& state) {
+static void construction_arena(benchmark::State& state) {
     for (auto _ : state) {
         Arena<false> a(kCapacityBytes);
-        benchmark::DoNotOptimize(a);
+        benchmark::DoNotOptimize(&a);
     }
 }
-BENCHMARK(ConstructionArena);
+BENCHMARK(construction_arena);
 
 // Measures constructing an empty, unused stdArena.
-static void ConstructionStd(benchmark::State& state) {
+static void construction_std(benchmark::State& state) {
     for (auto _ : state) {
         stdArena a(kCapacityBytes);
-        // Pass the address, not the object: GCC rejects DoNotOptimize(a)
-        // here because std::pmr::monotonic_buffer_resource has a const
-        // member, which GCC treats as read-only for the asm output that
-        // DoNotOptimize(Tp&) uses ("read-only reference used as 'asm'
-        // output"). The pointer overload has no such restriction, and
-        // ClobberMemory() keeps the construction from being optimized away.
         benchmark::DoNotOptimize(&a);
-        benchmark::ClobberMemory();
     }
 }
-BENCHMARK(ConstructionStd);
+BENCHMARK(construction_std);

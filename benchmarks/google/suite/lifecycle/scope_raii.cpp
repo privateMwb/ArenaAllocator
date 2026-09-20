@@ -22,13 +22,13 @@ constexpr std::size_t kSize = 4096;
 } // namespace
 
 // Measures a full ArenaScope construct/destruct pair.
-static void ScopeRaii(benchmark::State& state) {
+static void scope_raii(benchmark::State& state) {
     Arena<false> aSrc(kSize);
     benchmark::DoNotOptimize(aSrc.allocate(64));
 
     for (auto _ : state) {
         ArenaScope<false> scope(aSrc);
-        benchmark::DoNotOptimize(scope);
+        benchmark::DoNotOptimize(&scope);
     }
 }
-BENCHMARK(ScopeRaii);
+BENCHMARK(scope_raii);
