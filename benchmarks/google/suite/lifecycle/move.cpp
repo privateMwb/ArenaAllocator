@@ -31,7 +31,7 @@ static void move_construct(benchmark::State& state) {
         Arena<false> src(kSize);
         benchmark::DoNotOptimize(src.allocate(64));
         Arena<false> dst(std::move(src));
-        benchmark::DoNotOptimize(dst);
+        benchmark::DoNotOptimize(&dst);
     }
 }
 BENCHMARK(move_construct);

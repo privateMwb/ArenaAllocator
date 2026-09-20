@@ -28,7 +28,7 @@ constexpr std::size_t kCapacityBytes = 4096;
 static void construction_arena(benchmark::State& state) {
     for (auto _ : state) {
         Arena<false> a(kCapacityBytes);
-        benchmark::DoNotOptimize(a);
+        benchmark::DoNotOptimize(&a);
     }
 }
 BENCHMARK(construction_arena);
@@ -37,7 +37,7 @@ BENCHMARK(construction_arena);
 static void construction_std(benchmark::State& state) {
     for (auto _ : state) {
         stdArena a(kCapacityBytes);
-        benchmark::DoNotOptimize(a);
+        benchmark::DoNotOptimize(&a);
     }
 }
 BENCHMARK(construction_std);

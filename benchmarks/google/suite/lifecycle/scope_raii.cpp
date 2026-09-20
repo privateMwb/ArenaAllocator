@@ -28,7 +28,7 @@ static void scope_raii(benchmark::State& state) {
 
     for (auto _ : state) {
         ArenaScope<false> scope(aSrc);
-        benchmark::DoNotOptimize(scope);
+        benchmark::DoNotOptimize(&scope);
     }
 }
 BENCHMARK(scope_raii);

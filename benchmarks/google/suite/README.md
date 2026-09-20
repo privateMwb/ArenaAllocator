@@ -132,7 +132,11 @@ above — running allocation statistics.
   `<benchmark/benchmark.h>`.
 - **Preventing elision** — `benchmark::DoNotOptimize()` takes each loop
   body's result so the call can't be optimized away. A loop body with no
-  result (`reset()`, `destroy()`) has nothing to pass.
+  result (`reset()`, `destroy()`) has nothing to pass. When the thing
+  being kept alive is an object rather than a pointer or a number, pass
+  its address — `benchmark::DoNotOptimize(&a)` — because GCC rejects
+  `DoNotOptimize(a)` for some class types (`std::pmr::monotonic_buffer_resource`
+  fails with "read-only reference used as asm output").
 - **Fixed iteration counts** — Google Benchmark picks its own iteration
   count, which would exhaust a bump-allocated buffer. Benchmarks whose state
   accumulates (allocation, construction, `destroy()`) set
