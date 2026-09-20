@@ -34,7 +34,7 @@ constexpr std::size_t kIterations = kCapacityBytes / kLargeSize;
 
 // Measures Arena allocate() of a small, word-sized block at the default
 // alignment — the cheapest possible call through the hot path.
-static void AllocateSmallArena(benchmark::State& state) {
+static void allocate_small_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -42,11 +42,11 @@ static void AllocateSmallArena(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateSmallArena)->Iterations(kIterations);
+BENCHMARK(allocate_small_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() of a small, word-sized block at the
 // default alignment.
-static void AllocateSmallStd(benchmark::State& state) {
+static void allocate_small_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -54,11 +54,11 @@ static void AllocateSmallStd(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateSmallStd)->Iterations(kIterations);
+BENCHMARK(allocate_small_std)->Iterations(kIterations);
 
 // Measures Arena allocate() of a larger, cache-line-sized block at the
 // default alignment.
-static void AllocateLargeArena(benchmark::State& state) {
+static void allocate_large_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -66,11 +66,11 @@ static void AllocateLargeArena(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateLargeArena)->Iterations(kIterations);
+BENCHMARK(allocate_large_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() of a larger, cache-line-sized block at
 // the default alignment.
-static void AllocateLargeStd(benchmark::State& state) {
+static void allocate_large_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -78,11 +78,11 @@ static void AllocateLargeStd(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateLargeStd)->Iterations(kIterations);
+BENCHMARK(allocate_large_std)->Iterations(kIterations);
 
 // Measures Arena allocate() of a small block at an over-aligned (64-byte)
 // boundary — exercises the alignment padding path on every call.
-static void AllocateAlignedArena(benchmark::State& state) {
+static void allocate_aligned_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes, kOverAlignment);
 
     for (auto _ : state) {
@@ -90,11 +90,11 @@ static void AllocateAlignedArena(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateAlignedArena)->Iterations(kIterations);
+BENCHMARK(allocate_aligned_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() of a small block at an over-aligned
 // (64-byte) boundary.
-static void AllocateAlignedStd(benchmark::State& state) {
+static void allocate_aligned_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -102,4 +102,4 @@ static void AllocateAlignedStd(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateAlignedStd)->Iterations(kIterations);
+BENCHMARK(allocate_aligned_std)->Iterations(kIterations);

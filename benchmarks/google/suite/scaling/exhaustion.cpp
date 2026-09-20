@@ -50,7 +50,7 @@ constexpr std::size_t kIterations = 1'000'000;
 // Measures Arena allocate() with plenty of room left — the ordinary
 // success path. Wrapped in beginFrame()/endFrame() so the cursor never
 // advances cumulatively, for the same reason as capacity_growth.cpp.
-static void AllocateSuccessArena(benchmark::State& state) {
+static void allocate_success_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -59,7 +59,7 @@ static void AllocateSuccessArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(AllocateSuccessArena)->Iterations(kIterations);
+BENCHMARK(allocate_success_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() with plenty of room left.
 // Left unbounded (default upstream) deliberately: this case is not
@@ -67,17 +67,17 @@ BENCHMARK(AllocateSuccessArena)->Iterations(kIterations);
 // does when it needs more room — grow — rather than being reset
 // every call, which would load the measurement with reset
 // overhead that has nothing to do with allocate() itself.
-static void AllocateSuccessStd(benchmark::State& state) {
+static void allocate_success_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize));
 }
-BENCHMARK(AllocateSuccessStd)->Iterations(kIterations);
+BENCHMARK(allocate_success_std)->Iterations(kIterations);
 
 // Measures Arena allocate() with no room left — every call fails and
 // returns nullptr, noexcept.
-static void AllocateFailureArena(benchmark::State& state) {
+static void allocate_failure_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
     benchmark::DoNotOptimize(cSrc.allocate(cSrc.remaining()));
     // cSrc now has exactly 0 bytes remaining.
@@ -87,12 +87,12 @@ static void AllocateFailureArena(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateFailureArena);
+BENCHMARK(allocate_failure_arena);
 
 // Measures the bounded stdArena with no room left — every call fails.
 // The bounded stdArena has no choice but to throw, so this side must
 // catch std::bad_alloc every call.
-static void AllocateFailureStd(benchmark::State& state) {
+static void allocate_failure_std(benchmark::State& state) {
     alignas(std::max_align_t) static std::byte backing[kCapacityBytes];
     stdArena sSrc(backing, sizeof(backing), std::pmr::null_memory_resource());
     benchmark::DoNotOptimize(sSrc.allocate(kCapacityBytes));
@@ -108,4 +108,4 @@ static void AllocateFailureStd(benchmark::State& state) {
         }
     }
 }
-BENCHMARK(AllocateFailureStd);
+BENCHMARK(allocate_failure_std);

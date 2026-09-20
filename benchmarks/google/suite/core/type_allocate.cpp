@@ -35,7 +35,7 @@ static_assert(kIterations * sizeof(Large) <= kCapacityBytes,
 } // namespace
 
 // Measures Arena allocate<T>() for a small, single-member type.
-static void AllocateSmallTypeArena(benchmark::State& state) {
+static void allocate_small_type_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -43,10 +43,10 @@ static void AllocateSmallTypeArena(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateSmallTypeArena)->Iterations(kIterations);
+BENCHMARK(allocate_small_type_arena)->Iterations(kIterations);
 
 // Measures the stdArena equivalent for a small, single-member type.
-static void AllocateSmallTypeStd(benchmark::State& state) {
+static void allocate_small_type_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -54,10 +54,10 @@ static void AllocateSmallTypeStd(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateSmallTypeStd)->Iterations(kIterations);
+BENCHMARK(allocate_small_type_std)->Iterations(kIterations);
 
 // Measures Arena allocate<T>() for a larger, multi-member type.
-static void AllocateLargeTypeArena(benchmark::State& state) {
+static void allocate_large_type_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -65,10 +65,10 @@ static void AllocateLargeTypeArena(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateLargeTypeArena)->Iterations(kIterations);
+BENCHMARK(allocate_large_type_arena)->Iterations(kIterations);
 
 // Measures the stdArena equivalent for a larger, multi-member type.
-static void AllocateLargeTypeStd(benchmark::State& state) {
+static void allocate_large_type_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state) {
@@ -76,4 +76,4 @@ static void AllocateLargeTypeStd(benchmark::State& state) {
         benchmark::DoNotOptimize(p);
     }
 }
-BENCHMARK(AllocateLargeTypeStd)->Iterations(kIterations);
+BENCHMARK(allocate_large_type_std)->Iterations(kIterations);

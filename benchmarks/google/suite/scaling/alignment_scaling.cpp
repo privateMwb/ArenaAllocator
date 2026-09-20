@@ -40,7 +40,7 @@ constexpr std::size_t kIterations = 1'000'000;
 } // namespace
 
 // Measures Arena allocate() at the natural alignment of an int.
-static void AlignmentNaturalArena(benchmark::State& state) {
+static void alignment_natural_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes, kNaturalAlignment);
 
     for (auto _ : state) {
@@ -49,19 +49,19 @@ static void AlignmentNaturalArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(AlignmentNaturalArena)->Iterations(kIterations);
+BENCHMARK(alignment_natural_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() at the natural alignment of an int.
-static void AlignmentNaturalStd(benchmark::State& state) {
+static void alignment_natural_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize, kNaturalAlignment));
 }
-BENCHMARK(AlignmentNaturalStd)->Iterations(kIterations);
+BENCHMARK(alignment_natural_std)->Iterations(kIterations);
 
 // Measures Arena allocate() at cache-line alignment.
-static void AlignmentCacheLineArena(benchmark::State& state) {
+static void alignment_cache_line_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes, kCacheLineAlignment);
 
     for (auto _ : state) {
@@ -70,19 +70,19 @@ static void AlignmentCacheLineArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(AlignmentCacheLineArena)->Iterations(kIterations);
+BENCHMARK(alignment_cache_line_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() at cache-line alignment.
-static void AlignmentCacheLineStd(benchmark::State& state) {
+static void alignment_cache_line_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize, kCacheLineAlignment));
 }
-BENCHMARK(AlignmentCacheLineStd)->Iterations(kIterations);
+BENCHMARK(alignment_cache_line_std)->Iterations(kIterations);
 
 // Measures Arena allocate() at page alignment.
-static void AlignmentPageArena(benchmark::State& state) {
+static void alignment_page_arena(benchmark::State& state) {
     Arena<false> cSrc(kCapacityBytes, kPageAlignment);
 
     for (auto _ : state) {
@@ -91,13 +91,13 @@ static void AlignmentPageArena(benchmark::State& state) {
         cSrc.endFrame();
     }
 }
-BENCHMARK(AlignmentPageArena)->Iterations(kIterations);
+BENCHMARK(alignment_page_arena)->Iterations(kIterations);
 
 // Measures stdArena allocate() at page alignment.
-static void AlignmentPageStd(benchmark::State& state) {
+static void alignment_page_std(benchmark::State& state) {
     stdArena sSrc(kCapacityBytes);
 
     for (auto _ : state)
         benchmark::DoNotOptimize(sSrc.allocate(kAllocSize, kPageAlignment));
 }
-BENCHMARK(AlignmentPageStd)->Iterations(kIterations);
+BENCHMARK(alignment_page_std)->Iterations(kIterations);

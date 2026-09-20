@@ -26,7 +26,7 @@ constexpr std::size_t kSize = 4096;
 // source is rebuilt on every iteration — a moved-from Arena has nothing
 // left to move out of, so this cannot repeat on the same object like
 // a pure read can.
-static void MoveConstruct(benchmark::State& state) {
+static void move_construct(benchmark::State& state) {
     for (auto _ : state) {
         Arena<false> src(kSize);
         benchmark::DoNotOptimize(src.allocate(64));
@@ -34,12 +34,12 @@ static void MoveConstruct(benchmark::State& state) {
         benchmark::DoNotOptimize(dst);
     }
 }
-BENCHMARK(MoveConstruct);
+BENCHMARK(move_construct);
 
 // Measures move-assignment, ping-ponged between two populated arenas
 // so every iteration has a real (non-empty) source and destination to
 // move between, not a degenerate already-moved-from one.
-static void MoveAssign(benchmark::State& state) {
+static void move_assign(benchmark::State& state) {
     Arena<false> a1(kSize);
     Arena<false> a2(kSize);
     benchmark::DoNotOptimize(a1.allocate(64));
@@ -54,4 +54,4 @@ static void MoveAssign(benchmark::State& state) {
         flip = !flip;
     }
 }
-BENCHMARK(MoveAssign);
+BENCHMARK(move_assign);
