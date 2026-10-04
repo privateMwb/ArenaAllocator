@@ -26,11 +26,11 @@ jobs:
       contents: write
 
     env:
-      PACKAGE_NAME: hashmappro
-      REPOSITORY: privateMwb/HashMapPro
+      PACKAGE_NAME: arenapro
+      REPOSITORY: privateMwb/ArenaAllocator
       ROOT_DIR: .
-      CONAN_RECIPE_DIR: packaging/recipes/hashmappro/all
-      VCPKG_PORT_DIR: packaging/vcpkg/ports/hashmappro
+      CONAN_RECIPE_DIR: packaging/recipes/arenapro/all
+      VCPKG_PORT_DIR: packaging/vcpkg/ports/arenapro
 
     steps:
       - name: Resolve tag
